@@ -3,21 +3,81 @@
 Registro
 {% endblock %}
 {% block main%}
-<h1 class="text-center">Registrate</h1>
-<form action="#" method="post">
-    <div class="form-group">
-        <label for="exampleInputEmail1">Usuario</label>
-        <input type="text" class="form-control" id="usuario"
-            aria-describedby="emailHelp" placeholder="Ingresa usuario">
+
+    <div class="container ">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-danger alert-dismissible fade show flashes"
+            role="alert">
+            {% for message in messages %}
+            <button type="button" class="close" data-dismiss="alert"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>{{ message }}</strong>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <script>
+        $(".alert").alert();
+    </script>
+        <h1 class="text-center pt-5 pb-1">Registro de Usuarios</h1>
+        <div class="row">
+            <div class="col-xl-8 col-lg-8 col-md-11 col-sm-12 mx-auto">
+                <div class="card">
+                    <div class="card-header text-danger font-weight-bold">
+                        Registrate para poder entrar
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="/register">
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nombre:</label>
+                                <input type="text" autocomplete="off"
+                                    class="form-control" name="name" id="name"
+                                    placeholder="Ingresa el nombre">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Usuario:</label>
+                                <input type="text" autocomplete="off"
+                                    class="form-control" name="username"
+                                    id="username"
+                                    placeholder="Ingresa el usuario">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password:</label>
+                                <input type="password" autocomplete="off"
+                                    class="form-control" name="password"
+                                    id="password"
+                                    placeholder="Ingresa el password">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="confirmar_password"
+                                    class="form-label">Confirmar password:</label>
+                                <input type="password" class="form-control"
+                                    autocomplete="off" name="confirmation"
+                                    id="confirmartion"
+                                    placeholder="Ingresa la confirmacion del password">
+                            </div>
+
+                            <div class="boton d-flex justify-content-center">
+                                <button type="submit" name="registrarse"
+                                class="btn btn-dark"><i
+                                    class="bi bi-person-bounding-box"></i>
+                                Registrarse</button>
+                            </div>
+                            
+                        </form>
+                        <span class="d-flex justify-content-center pt-1">Have a account? <a class="pl-1" href="/login" id="login"> Log In</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div class="form-group">
-        <label for="contraseña">Contraseña</label>
-        <input type="password" class="form-control" id="contraseña" placeholder="Password">
-    </div>
-    <div class="form-group">
-        <label for="confirmation">Confirmar contraseña</label>
-        <input type="password" class="form-control" id="confirmation" placeholder="Confirmación">
-    </div>
-    <button type="submit" class="btn btn-primary">Crear Cuenta</button>
-</form>
+
 {% endblock %}
