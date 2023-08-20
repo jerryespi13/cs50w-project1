@@ -1,20 +1,24 @@
-# Project 1
+# Project 1: Books
+ Web Programming with Python and JavaScript
 
-Web Programming with Python and JavaScript
+## Instalación entorno virtual
+### Crea la carpeta : 
+>`py -3 -m venv .venv`   
+### Activa el entorno virtual:
+> `.venv\Scripts\activate`
+### Instala los requerimientos: 
+> `pip install -r .\requirements.txt`
+## Variables de entorno:
+### Asigna el valor a la variable de entorno FLASK_APP 
+>`$env:FLASK_APP = "application.py"`
+### Asigna el valor a la variable de entorno DATABASE_URL
+>`$env:DATABASE_URL = "URL"` 
 
-## Instalacion entorno virtual
-- Crea la carpeta :
-py -3 -m venv .venv
-- activa el entorno virtual:
- .venv\Scripts\activate
-- Instala los requerimientos:
-pip install -r .\requirements.txt 
-- variable de entorno:
-set FLASK_APP=application.py
-$env:FLASK_APP = "application.py"
-set DATABASE_URL="enlace"
-$env:DATABASE_URL = ""
+&nbsp;&nbsp;&nbsp; URL es el enlace a tu base de datos en la nube.
 
-database url from postgres:// to postgresql:// solved the problem.
+&nbsp;&nbsp;&nbsp; si usas una base de datos postgres en render edita en enlace que render te brinda de la siguiente manera:
 
-flask run
+>`database url from postgres:// to postgresql://`
+
+## Corre la aplicación web
+>`flask run`
