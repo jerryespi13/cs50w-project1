@@ -1,8 +1,8 @@
 import os
 
-from flask import Flask, session, render_template, request
+from flask import Flask, session, render_template, request, redirect
 from flask_session import Session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
@@ -32,6 +32,14 @@ def register():
     
     else:
         # TO DO
+        #query = text("SELECT * FROM usuarios")
+        #datos = db.execute(query).fetchall()
+        #print(datos)
+        nombre = request.form.get("name")
+        usuario = request.form.get("username")
+        contraseña = request.form.get("password")
+        confirmacion_contraseña = request.form.get("confirmation")
+        print(nombre + " " + usuario + " " + contraseña + " "+ confirmacion_contraseña)
         return "Hacer Metodo POST"
 
 @app.route("/login", methods=["GET","POST"])
@@ -42,3 +50,4 @@ def login():
     else:
         #TO DO
         return "Hacer Metodo POST"
+    

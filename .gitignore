@@ -11,3 +11,5 @@ venv.bak/
 *pyc
 
 flask_session
+
+db.txt
