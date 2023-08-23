@@ -78,13 +78,33 @@ def register():
         # devuelto por la consulta con el usuario ingresado por el usuario
         
         if len(resultado) != 0:
-            print(len(resultado))
             # si el usuario existe lo notificamos para que elija otro nombre de usuario
             if resultado[0].usuario == usuario:
-                flash('usuario ya existe')
+                flash('Usuario ya existe')
                 return render_template("register.html")
         
-        return "Hacer vista respues Metodo POST"
+        # si el usuario no existe guardamos los datos en la DB
+        # generando un hash para la contraseña ingresada
+        contraseña_segura = generate_password_hash(contraseña)
+        # creamos nuestra query
+        query = text(
+                        """
+                            INSERT INTO usuarios (nombre, usuario, contraseña)
+                            VALUES (:nombre, :usuario, :contraseña);
+                        """
+                    )
+        # vinculamos variables
+        query.bindparams(
+                            bindparam("nombre", type_=String()),
+                            bindparam("usuario", type_=String()),
+                            bindparam("contraseña", type_=String())
+                        )
+        # asignamos variables y ejecutamos nuestra query
+        db.execute(query,{"nombre":nombre, "usuario":usuario, "contraseña":contraseña_segura})
+        
+        resultado = db.commit()
+        # despues que el usario se registre lo redireccionamos al login
+        return redirect("/login")
 
 @app.route("/login", methods=["GET","POST"])
 def login():
