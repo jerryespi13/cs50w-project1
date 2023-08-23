@@ -1,9 +1,14 @@
 import os
-
-from flask import Flask, session, render_template, request, flash
+# Flask
+from flask import Flask, session, render_template, request, flash, redirect
+# para el manejo de las sesiones
 from flask_session import Session
+# para el manejo de la base de datos
 from sqlalchemy import create_engine, text, bindparam, String
 from sqlalchemy.orm import scoped_session, sessionmaker
+# para contraseñas hasheadas
+from werkzeug.security import check_password_hash, generate_password_hash
+
 
 app = Flask(__name__)
 
@@ -23,7 +28,7 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
-    return render_template("layout.html")
+    return redirect("/login")
 
 @app.route("/register", methods=["GET","POST"])
 def register():
@@ -79,7 +84,7 @@ def register():
                 flash('usuario ya existe')
                 return render_template("register.html")
         
-        return "Hacer Metodo POST"
+        return "Hacer vista respues Metodo POST"
 
 @app.route("/login", methods=["GET","POST"])
 def login():
