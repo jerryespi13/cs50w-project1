@@ -25,7 +25,7 @@ Registro
                                         aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
-                                    <strong>{{ message }}</strong>
+                                    <strong class="d-flex justify-content-center">{{ message }}</strong>
                                     {% endfor %}
                                 </div>
                                 {% endif %}
@@ -38,7 +38,7 @@ Registro
                                 <label for="name" class="form-label">Nombre:</label>
                                 <input type="text" autocomplete="off"
                                     class="form-control" name="name" id="name"
-                                    placeholder="Ingresa su nombre">
+                                    placeholder="Ingresa su nombre" autofocus>
                             </div>
 
                             <div class="mb-3">
