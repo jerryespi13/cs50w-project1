@@ -4,24 +4,6 @@ Registro
 {% endblock %}
 {% block main%}
 
-    <div class="container ">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div class="alert alert-danger alert-dismissible fade show flashes"
-            role="alert">
-            {% for message in messages %}
-            <button type="button" class="close" data-dismiss="alert"
-                aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <strong>{{ message }}</strong>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
-        <script>
-        $(".alert").alert();
-    </script>
         <h1 class="text-center pt-3 pb-1">Registro de Usuarios</h1>
         <div class="row pb-3">
             <div class="col-xl-8 col-lg-8 col-md-11 col-sm-12 mx-auto">
@@ -31,6 +13,26 @@ Registro
                     </div>
                     <div class="card-body">
                         <form method="POST" action="/register">
+
+                            <!-- Mensajes Flash -->
+                            <div class="container ">
+                                {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                <div class="alert alert-danger alert-dismissible fade show flashes"
+                                    role="alert">
+                                    {% for message in messages %}
+                                    <button type="button" class="close" data-dismiss="alert"
+                                        aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <strong>{{ message }}</strong>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% endwith %}
+                                <script>
+                                    $(".alert").alert();
+                                </script>
 
                             <div class="mb-3">
                                 <label for="name" class="form-label">Nombre:</label>
