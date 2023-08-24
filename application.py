@@ -139,6 +139,15 @@ def login():
         session["name"] = resultado.nombre
         return redirect("/search")
     
+# ruta para cerrar session
+@app.route("/logout")
+def logout():
+    """Log user out"""
+    # Borramos todas las variables de session
+    session.clear()
+    # Redirigimos a la pagina de inicio
+    return redirect("/")
+
 @app.route("/search")
 def search():
     print(session["name"])
