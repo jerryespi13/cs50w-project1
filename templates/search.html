@@ -1,0 +1,23 @@
+{% extends "/layout.html"%}
+{% block title%}
+Search
+{% endblock %}
+
+
+
+{% block main %} 
+<div class="text-center pt-2">
+    <h1 >El libro que te interesa a un solo click</h1>
+    <p>
+        Sitio web en el cual puedes registrarte para dejar reseñas en los libros y a su vez ver reseñas hechas por otras personas
+    </p>
+
+</div>
+<div class="search">
+    <form class="form-inline">
+        <input class="form-control mr-sm-2 col-lg-9 col-md-9 col-sm-12" type="search" placeholder="Busca tu libro favorito" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0 col-lg-2 col-md-2 col-sm-2" type="submit">Search</button>
+      </form>
+</div> 
+
+{%endblock%}
