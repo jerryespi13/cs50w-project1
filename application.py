@@ -112,6 +112,35 @@ def login():
         return render_template("login.html")
     
     else:
-        #TO DO
-        return "Hacer Metodo POST"
+        usuario = request.form.get("username")
+        contraseña = request.form.get("password")
+        if not usuario:
+            flash("Introducir campo usuario")
+            return render_template("login.html")
+        elif not contraseña:
+            flash("Introducir campo contraseña")
+            return render_template("login.html")
+        query = text(
+                    """
+                        SELECT * FROM usuarios WHERE usuario = :usuario 
+                    """
+                    )
+        query.bindparams(
+            bindparam("usuario", type_=String())
+        )
+        resultado = db.execute(query, {"usuario":usuario}).fetchone()
+        if resultado == None or not check_password_hash(resultado.contraseña, contraseña):
+            flash("Usuario o Contraseña incorrecto")
+            return redirect("/login")
+        
+        print(resultado)
+        # creamos la session del usuario
+        session["user_id"] = resultado.id
+        session["name"] = resultado.nombre
+        return redirect("/search")
     
+@app.route("/search")
+def search():
+    print(session["name"])
+    print(session["user_id"])
+    return render_template("search.html")
