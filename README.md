@@ -17,6 +17,7 @@
 ### Requerimientos solicitados
 - [x] Registro: Los usuarios deberían ser capaces de registrarse en tu sitio web, proveyendo (como mínimo) un nombre de usuario y una contraseña.
 - [x] Inicio de Sesión: Los usuarios, una vez registrados, deberían ser capaces de iniciar sesión en tu sitio web con su nombre de usuario y contraseña.
+- [x] Cierre de sesión: Los usuarios conectados deberían ser capaces de cerrar sesión.
 
 
 ## Instalación entorno virtual
