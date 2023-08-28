@@ -39,6 +39,9 @@
 
 >`database url from postgres:// to postgresql://`
 
+### Importa los libros del csv a la base de datos
+>`python import.py`
+
 ## Corre la aplicación web
 >`flask run`
 
