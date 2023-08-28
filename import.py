@@ -9,12 +9,6 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
-query_eliminar_tabla_libros = text(
-                                    """
-                                        DROP TABLE libros
-                                    """
-                                  )
-
 # abrimos el archivo
 with open("books.csv") as file:
     columnas = '"id" serial primary key, '
