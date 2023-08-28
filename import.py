@@ -28,6 +28,7 @@ with open("books.csv") as file:
             )
     db.execute(query_crear_tabla_libros)
     db.commit()
+
     # insertamos los datos del csv a la DB
     a = 1
     for datos in reader:
@@ -37,8 +38,9 @@ with open("books.csv") as file:
                                                 VALUES ({field_names.removesuffix(", ")});
                                                 """
                                             )
-        print(f" Insertando: ({a}) {datos}")
-        a +=1
-        # dos astericos (**) operador de desempaquetado de diccionarios
+        # dos astericos (**) operador de desempaquetado
         db.execute(query_insertar_datos_tabla_libros,{**datos})
+        print(f" Insertado: ({a}) {datos}")
+        a +=1
     db.commit()
+    print("Datos insertados correctamente")
