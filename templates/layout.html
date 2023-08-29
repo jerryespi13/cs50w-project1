@@ -28,16 +28,16 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div  data-toggle="collapse">
-            <span class="navbar-text ">
-                Bienvenido {{session["name"]}}
-              </span>
-              <!--
-              <a href="/logout" class="btn btn-primary btn-lg active border-secondary px-2 pt-0 pb-0 border border-warning" role="button" aria-pressed="true">Salir</a>
-              -->
-            </div>
+          <div class="usuario navbar-text">
+            Bienvenido
+            <span class="font-weight-bold text-primary">
+               {{session["name"]}}
+            </span>
+          </div>
+        </div>
         <div class="collapse navbar-collapse" id="navbarText">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+            <li class="nav-item">
               <a class="nav-link" href="/search">Busqueda</a>
             </li>
             <li class="nav-item">
@@ -45,6 +45,9 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Editar usuario</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger font-weight-bold" href="/logout">Cerrar Sesión</a>
             </li>
           </ul>
         </div>
