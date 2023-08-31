@@ -1,6 +1,6 @@
 import os
 # Flask
-from flask import Flask, session, render_template, request, flash, redirect
+from flask import Flask, session, render_template, request, flash, redirect, jsonify
 # para el manejo de las sesiones
 from flask_session import Session
 # para el manejo de la base de datos
@@ -8,7 +8,10 @@ from sqlalchemy import create_engine, text, bindparam, String
 from sqlalchemy.orm import scoped_session, sessionmaker
 # para contraseñas hasheadas
 from werkzeug.security import check_password_hash, generate_password_hash
-
+# para variables de entornos
+from dotenv import load_dotenv
+# Cargamos nuestras variables de entorno
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -150,6 +153,16 @@ def logout():
 
 @app.route("/search")
 def search():
-    print(session["name"])
-    print(session["user_id"])
     return render_template("search.html")
+
+@app.route("/listalibros", methods=["GET"])
+def listalibros():
+    """
+    devuelve en JSON un listado de los libros para hacer uso de autocomplete
+    """
+    query_obtener_libros = text("SELECT title FROM libros")
+    datos = db.execute(query_obtener_libros).fetchall()
+    libros = []
+    for dato in datos:
+        libros.append(dato.title)   
+    return jsonify({"libros":libros})
