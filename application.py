@@ -1,4 +1,5 @@
 import os
+import requests
 # Flask
 from flask import Flask, session, render_template, request, flash, redirect, jsonify
 # para el manejo de las sesiones
@@ -166,3 +167,28 @@ def listalibros():
     for dato in datos:
         libros.append(dato.title)   
     return jsonify({"libros":libros})
+
+@app.route("/libros",methods=["POST", "GET"])
+def libros():
+    if request.method == "GET":
+        return redirect("/search")
+    else:
+        parametro = request.form.get("search").lower()
+        print(parametro)
+        query_libros = text (
+                                """
+                                    SELECT isbn FROM libros WHERE LOWER(title) LIKE :title OR isbn LIKE :title OR LOWER(author) LIKE :title
+                                """
+                            )
+        query_libros.bindparams(
+            bindparam(
+                "title", type_=String()
+            )
+        )
+        libro = db.execute(query_libros, {"title": '%{}%'.format(parametro)}).fetchall()
+        response = []
+        for dato in libro:
+            datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+dato.isbn).json()
+            if "items" in datos:
+                response.append(datos['items'][0]['volumeInfo'])
+        return response
