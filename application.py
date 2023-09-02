@@ -152,9 +152,44 @@ def logout():
     # Redirigimos a la pagina de inicio
     return redirect("/")
 
-@app.route("/search")
+@app.route("/search", methods=["GET","POST"])
 def search():
-    return render_template("search.html")
+    # pintamos la pagina de busqueda
+    if request.method == "GET":
+        return render_template("search.html")
+    
+    # recibimos la busqueda a realizar
+    else:
+        # obtenemos el parametro a buscar
+        parametro = request.form.get("search").lower()
+        # si no ingresaron nada lo hacemos saber
+        if not parametro:
+            flash("No ingresó ningún término de búsqueda")
+            return render_template("search.html")
+        print(parametro)
+        # buscamos que exista en nuestra DB
+        query_libros = text (
+                                """
+                                    SELECT isbn FROM libros WHERE LOWER(title) LIKE :title OR isbn LIKE :title OR LOWER(author) LIKE :title
+                                """
+                            )
+        query_libros.bindparams(
+            bindparam(
+                "title", type_=String()
+            )
+        )
+        libro = db.execute(query_libros, {"title": '%{}%'.format(parametro)}).fetchall()
+        # si la consulta al DB no devuelve nada, el libro no existe en nuestra DB
+        if len(libro) == 0:
+            flash("Libro no encontrado")
+            return render_template("search.html")
+        
+        response = []
+        for dato in libro:
+            datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+dato.isbn).json()
+            if "items" in datos:
+                response.append(datos['items'][0]['volumeInfo'])
+        return render_template("search.html", response=response)
 
 @app.route("/listalibros", methods=["GET"])
 def listalibros():
@@ -167,28 +202,3 @@ def listalibros():
     for dato in datos:
         libros.append(dato.title)   
     return jsonify({"libros":libros})
-
-@app.route("/libros",methods=["POST", "GET"])
-def libros():
-    if request.method == "GET":
-        return redirect("/search")
-    else:
-        parametro = request.form.get("search").lower()
-        print(parametro)
-        query_libros = text (
-                                """
-                                    SELECT isbn FROM libros WHERE LOWER(title) LIKE :title OR isbn LIKE :title OR LOWER(author) LIKE :title
-                                """
-                            )
-        query_libros.bindparams(
-            bindparam(
-                "title", type_=String()
-            )
-        )
-        libro = db.execute(query_libros, {"title": '%{}%'.format(parametro)}).fetchall()
-        response = []
-        for dato in libro:
-            datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+dato.isbn).json()
-            if "items" in datos:
-                response.append(datos['items'][0]['volumeInfo'])
-        return response
