@@ -202,3 +202,8 @@ def listalibros():
     for dato in datos:
         libros.append(dato.title)   
     return jsonify({"libros":libros})
+
+# Error 404 Página no encontrada
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("error.html", error="Página no encontrada..."), 404

@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block title %}{{error}}{% endblock %}
+{% block main %}
+<div class="error">
+    <h1>{{error}}</h1>
+    <picture>
+        <img src="/static/images/error.avif" class="img-fluid ${3|rounded-top,rounded-right,rounded-bottom,rounded-left,rounded-circle,|}" alt="">
+    </picture>
+</div>
+{% endblock %}
