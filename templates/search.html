@@ -1,66 +1,65 @@
 {% extends "/layout.html"%}
 {% block title%}
-Search
+Búsqueda
 {% endblock %}
 
-{% block main %} 
+{% block main %}
 <div class="text-center pt-2">
-    <h1 >El libro que te interesa a un solo click</h1>
+    <h1>El libro que te interesa a un solo click</h1>
     <p>
-        Sitio web en el cual puedes registrarte para dejar reseñas en los libros y a su vez ver reseñas hechas por otras personas
+        Sitio web en el cual puedes registrarte para dejar reseñas en los libros
+        y a su vez ver reseñas hechas por otras personas
     </p>
 </div>
 <div class="search">
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="alert alert-danger alert-dismissible fade show flashes" role="alert">
-                {% for message in messages %}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <strong class="d-flex justify-content-center">{{ message }}</strong>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="alert alert-danger alert-dismissible fade show flashes"
+        role="alert">
+        {% for message in messages %}
+        <button type="button" class="close" data-dismiss="alert"
+            aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <strong class="d-flex justify-content-center">{{ message }}</strong>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
     <script>
         $(".alert").alert();
     </script>
-    
-    <form class="form-inline" action="/search" method="POST">
-        <input class="form-control col-lg-10 col-md-10 col-sm-12" autocomplete="off" type="search" placeholder="Busca tu libro favorito" id="search" name="search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-1 col-lg-2 col-md-2 col-sm-12" type="submit">Search</button>
+
+    <form class="form-inline pb-3 pt-2" action="/search" method="POST">
+        <input class="form-control col-lg-10 col-md-10 col-sm-12"
+            autocomplete="off" type="search"
+            placeholder="Busca tu libro favorito" id="search" name="search"
+            aria-label="Search">
+        <button
+            class="btn btn-outline-success my-2 my-sm-1 col-lg-2 col-md-2 col-sm-12"
+            type="submit">Search</button>
     </form>
 </div>
-<div class="row d-flex justify-content-around">
-{%for respuesta in response%}
-    <div class="card text-center mb-2 p-1 mx-2 col-10 col-sm-6 col-md-5 col-lg-5">
-        <img class="card-img mt-2" style="object-fit: contain; height: 50%;"
-            {% if respuesta.imageLinks %}
-            src="{{respuesta['imageLinks']['smallThumbnail']}}"
-            {% else %}
-            src=""
-            alt="no hay imagen"{% endif %}>
-            
-        <div
-            class="mt-2 rounded-0 product-overlay d-flex align-items-center justify-content-center">
-            <ul class="list-unstyled">
-             
-                <li>
-                    <form action="/verproducto" method="get">
-                        <input type="hidden" name="id" value="" id="id">
-                        <button type="submit" class="btn btn-secondary text-white mt-2">
-                            Ver libro
-                            <i class="far fa-eye"></i>
-                        </button>
-                    </form>
-                </li>
-       
-            </ul>
-        </div>
-        <div class="card-body p-0">
-            <h4 class="card-title">{{respuesta['title']}}</h4>
-            <h3 class="card-text">{{respuesta['authors']}}</h3>
+<div class="row d-flex justify-content-around pb-5 mb-5">
+    {%for libro in libros%}
+    <div class="card mt-2 p-1 mx-2 col-10 col-sm-6 col-md-5 col-lg-5" >
+        <div class="card-body">
+            <h5 class="card-title">{{libro.title}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Autor: {{libro.author}}</h6>
+            <h6 class="card-subtitle mb-2 text-muted">Año: {{libro.year}}</h6>
+            <p class="card-text">Para ver más detalles de éste libro de click en
+                el siguiente botón</p>
+            <div
+                class="mt-2 rounded-0 product-overlay d-flex align-items-center justify-content-center">
+                <form action="#" method="get">
+                    <input type="hidden" name="isbn" value="{{libro.isbn}}"
+                        id="isbn">
+                    <button type="submit"
+                        class="btn btn-secondary text-white mt-2">
+                        Detalles
+                    </button>
+                </form>
+            </div>
 
         </div>
     </div>

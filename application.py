@@ -136,8 +136,7 @@ def login():
         if resultado == None or not check_password_hash(resultado.contraseña, contraseña):
             flash("Usuario o Contraseña incorrecto")
             return redirect("/login")
-        
-        print(resultado)
+
         # creamos la session del usuario
         session["user_id"] = resultado.id
         session["name"] = resultado.nombre
@@ -166,30 +165,23 @@ def search():
         if not parametro:
             flash("No ingresó ningún término de búsqueda")
             return render_template("search.html")
-        print(parametro)
         # buscamos que exista en nuestra DB
         query_libros = text (
                                 """
-                                    SELECT isbn FROM libros WHERE LOWER(title) LIKE :title OR isbn LIKE :title OR LOWER(author) LIKE :title
+                                    SELECT * FROM libros WHERE LOWER(title) LIKE :parametro OR isbn LIKE :parametro OR LOWER(author) LIKE :parametro
                                 """
                             )
         query_libros.bindparams(
             bindparam(
-                "title", type_=String()
+                "parametro", type_=String()
             )
         )
-        libro = db.execute(query_libros, {"title": '%{}%'.format(parametro)}).fetchall()
+        libro = db.execute(query_libros, {"parametro": '%{}%'.format(parametro)}).fetchall()
         # si la consulta al DB no devuelve nada, el libro no existe en nuestra DB
         if len(libro) == 0:
             flash("Libro no encontrado")
             return render_template("search.html")
-        
-        response = []
-        for dato in libro:
-            datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+dato.isbn).json()
-            if "items" in datos:
-                response.append(datos['items'][0]['volumeInfo'])
-        return render_template("search.html", response=response)
+        return render_template("search.html", libros=libro)
 
 @app.route("/listalibros", methods=["GET"])
 def listalibros():
