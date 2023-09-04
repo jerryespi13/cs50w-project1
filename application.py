@@ -9,6 +9,9 @@ from sqlalchemy import create_engine, text, bindparam, String
 from sqlalchemy.orm import scoped_session, sessionmaker
 # para contraseñas hasheadas
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from helpers import *
+
 # para variables de entornos
 from dotenv import load_dotenv
 # Cargamos nuestras variables de entorno
@@ -152,6 +155,7 @@ def logout():
     return redirect("/")
 
 @app.route("/search", methods=["GET","POST"])
+@login_required
 def search():
     # pintamos la pagina de busqueda
     if request.method == "GET":
@@ -194,6 +198,19 @@ def listalibros():
     for dato in datos:
         libros.append(dato.title)   
     return jsonify({"libros":libros})
+
+@app.route("/verlibro")
+def verlibro():
+    libro = request.args.get("isbn")
+    if libro:
+        response = []
+        datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+libro).json()
+
+        if "items" in datos:
+            response.append(datos['items'][0]['volumeInfo'])
+        print(response)
+        return render_template("detalles.html", response=response)
+
 
 # Error 404 Página no encontrada
 @app.errorhandler(404)
