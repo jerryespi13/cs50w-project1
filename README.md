@@ -19,6 +19,7 @@
 - [x] Inicio de Sesión: Los usuarios, una vez registrados, deberían ser capaces de iniciar sesión en tu sitio web con su nombre de usuario y contraseña.
 - [x] Cierre de sesión: Los usuarios conectados deberían ser capaces de cerrar sesión.
 - [x] En un archivo Python llamado import.py separado de tu aplicación web, escriba un programa que tome los libros y los importe a su base de datos PostgreSQL
+- [x] Búsqueda: Una vez que el usuario ha iniciado sesión, deberían ser llevados a una página donde puedan buscar un libro.
 
 ## Instalación entorno virtual
 ### Crea la carpeta : 
