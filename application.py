@@ -181,6 +181,7 @@ def search():
             )
         )
         libro = db.execute(query_libros, {"parametro": '%{}%'.format(parametro)}).fetchall()
+        db.close()
         # si la consulta al DB no devuelve nada, el libro no existe en nuestra DB
         if len(libro) == 0:
             flash("Libro no encontrado")
@@ -200,6 +201,7 @@ def listalibros():
     return jsonify({"libros":libros})
 
 @app.route("/verlibro")
+@login_required
 def verlibro():
     libro = request.args.get("isbn")
     if libro:
