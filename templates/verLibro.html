@@ -5,7 +5,7 @@ Detalles del libro
 
 {% block main %}
 
-<div class="card card-solid mt-2">
+<div class="card card-solid" id="card-libro">
     <div class="card-body m-0">
         <div class="row">
             <div class="col-12 col-sm-6">
@@ -14,7 +14,7 @@ Detalles del libro
                     <img src="{{response[0]['imageLinks']['thumbnail']}}" style="width: 90%; object-fit: contain;" class="product-image" alt="Product Image">
                 </div>
             </div>
-            <div class="col-12 col-sm-6">
+            <div class="col-12 col-sm-6" id="card-libro-info">
                 <h3 class="my-3">Titulo: {{response[0]['title']}}</h3>
                 <h5 class="card-subtitle mb-2 text-muted">Autor: {{response[0]['authors']|trim("[']")}}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">Editora: {{response[0]['publisher']|trim("'")}}, {{response[0]['publishedDate']|trim("'")}}</h6>
@@ -24,7 +24,7 @@ Detalles del libro
                 <hr>
                 
                 <h4>Descripción</h4>
-                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <div class="card-libro-descripcion text-muted">
                     <p>
                         {{response[0]['description']}}
                     </p>
@@ -35,13 +35,41 @@ Detalles del libro
                     <input type="hidden" name="average" id="average" value="{{response[0]['averageRating']}}">
                     <div class="estrellas" id="estrellas">
                     </div>
+                    <div class="reseñas-google">
+                        <h5 class="card-subtitle mb-2 text-muted" id="reseña-promedio">{{response[0]['averageRating']}}</h5>
+                        <h5 class="card-subtitle mb-2 text-muted" id="reseña-total">{{response[0]['ratingsCount']}} Ratings</h5>
                     </div>
-                </div> 
+                </div>
+            </div> 
         </div>
     </div>
 </div>
 <section class="reseñas">
-    
+    <h2 class="">Reviews</h2>
+    <div class="post">
+        <div class="user-block">
+            <img class="img-circle img-bordered-sm" src="/static/images/avatar.png" alt="user image">
+            <span class="username">
+            <a href="#">jerryespi</a>
+            <a href="#" class="float-right btn-tool"><i class="fas fa-times"></i></a>
+            </span>
+            <span class="description">Shared publicly - 7:30 PM today</span>
+        </div>
+        <div class="puntuacion-usuario">
+            <img src="/static/images/star-fill.svg" alt="">
+            <img src="/static/images/star-fill.svg" alt="">
+            <img src="/static/images/star-fill.svg" alt="">
+            <img src="/static/images/star.svg" alt="">
+            <img src="/static/images/star.svg" alt="">
+        </div>
+        <p>
+        Lorem ipsum represents a long-held tradition for designers,
+        typographers and the like. Some people hate it and argue for
+        its demise, but others ignore the hate as they create awesome
+        tools to help create filler text for everyone from bacon lovers
+        to Charlie Sheen fans.
+        </p>   
+    </div>
 </section>
 
 <script src="/static/js/createRating.js"></script>

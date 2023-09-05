@@ -43,6 +43,77 @@ html{
 .estrellas img{
     width: 2.5rem
 }
+
+.reseñas-google{
+    display: flex;
+}
+.reseñas-google #reseña-promedio{
+    font-size: 60px;
+
+}
+
+.reseñas-google #reseña-total{
+    margin-left: 10px;
+    line-height: 70px;
+}
+
 .reseñas{
     padding-bottom: 100px;
+}
+
+.reseñas h2{
+    text-align: center;
+    font-weight: 600;
+    color: #423e3e;
+    font-size: 48px;
+}
+
+.post {
+    border-bottom: 1px solid #adb5bd;
+    color: #969292;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+}
+
+.post .user-block {
+    margin-bottom: 15px;
+    width: 100%;
+}
+.user-block{
+    float: left;
+}
+
+.user-block img{
+    float: left;
+    height: 40px;
+    width: 40px;
+}
+
+.img-circle{
+    border-radius: 50%;
+}
+
+.img-bordered-sm {
+    border: 2px solid #adb5bd;
+    padding: 2px;
+}
+
+.user-block .username{
+    font-size: 16px;
+    font-weight: 600;
+    display: block;
+    margin-left: 50px;
+    margin-top: -1px;
+}
+
+.user-block .description{
+    display: block;
+    margin-left: 50px;
+    color: #6c757d;
+    font-size: 13px;
+    margin-top: -3px;
+}
+
+.puntuacion-usuario img{
+    width: 25px;
 }
