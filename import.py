@@ -5,6 +5,11 @@ import csv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+# para variables de entornos
+from dotenv import load_dotenv
+# Cargamos nuestras variables de entorno
+load_dotenv()
+
 # Set up database
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
