@@ -1,0 +1,48 @@
+{% extends "/layout.html"%}
+{% block title%}
+Detalles del libro
+{% endblock %}
+
+{% block main %}
+
+<div class="card card-solid mt-2">
+    <div class="card-body m-0">
+        <div class="row">
+            <div class="col-12 col-sm-6">
+                <h3 class="d-inline-block d-sm-none">Titulo: {{response[0]['title']}}</h3>
+                <div class="col-12 text-center">
+                    <img src="{{response[0]['imageLinks']['thumbnail']}}" style="width: 90%; object-fit: contain;" class="product-image" alt="Product Image">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <h3 class="my-3">Titulo: {{response[0]['title']}}</h3>
+                <h5 class="card-subtitle mb-2 text-muted">Autor: {{response[0]['authors']|trim("[']")}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Editora: {{response[0]['publisher']|trim("'")}}, {{response[0]['publishedDate']|trim("'")}}</h6>
+                <h6 class="card-subtitle mb-2 text-muted">ISBN: {{response[0]['industryIdentifiers'][1]['identifier']}}</h6>
+                <h6 class="card-subtitle mb-2 text-muted">Categoria: {{response[0]['categories']|trim("[']")}}</h6>
+                <h6 class="card-subtitle mb-2 text-muted">Idioma: {{response[0]['language']|upper()}} - {{response[0]['pageCount']}} páginas</h6>
+                <hr>
+                
+                <h4>Descripción</h4>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <p>
+                        {{response[0]['description']}}
+                    </p>
+                </div>
+                <hr>
+                <h4>Puntuación</h4>
+                <div class="cajaestrellas">
+                    <input type="hidden" name="average" id="average" value="{{response[0]['averageRating']}}">
+                    <div class="estrellas" id="estrellas">
+                    </div>
+                    </div>
+                </div> 
+        </div>
+    </div>
+</div>
+<section class="reseñas">
+    
+</section>
+
+<script src="/static/js/createRating.js"></script>
+{% endblock%}

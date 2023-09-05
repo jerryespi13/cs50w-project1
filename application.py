@@ -210,8 +210,7 @@ def verlibro():
 
         if "items" in datos:
             response.append(datos['items'][0]['volumeInfo'])
-        print(response)
-        return render_template("detalles.html", response=response)
+        return render_template("verLibro.html", response=response)
 
 
 # Error 404 Página no encontrada
