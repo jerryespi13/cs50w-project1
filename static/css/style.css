@@ -30,3 +30,19 @@ html{
 .error picture img{
     height: 60vh;
 }
+
+#card-libro{
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.card-libro-descripcion{
+    font-size:small;
+}
+
+.estrellas img{
+    width: 2.5rem
+}
+.reseñas{
+    padding-bottom: 100px;
+}
