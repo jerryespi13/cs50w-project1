@@ -233,11 +233,33 @@ def verlibro():
         query_reseñas.bindparams(bindparam("libro_id", type_=Integer()))
         reseñas = db.execute(query_reseñas, {"libro_id":id}).fetchall()
         db.close()
-        print(reseñas)
         return render_template("verLibro.html", response=response, reseñas=reseñas)
     
     else:
         return render_template("error.html", error="Libro no existe"), 404
+
+@app.route("/api/<isbn>")
+def api(isbn):
+    query_api = text(
+                    """
+                        SELECT libros.isbn, libros.title, libros.author, libros.year,
+                        COALESCE(to_char(AVG(ratings.puntuacion),'9.99'), '0') AS average_score,
+                        COUNT(ratings.puntuacion) AS review_count
+                        FROM libros
+                        LEFT OUTER JOIN ratings ON libros.id = ratings.libro_id
+                        WHERE libros.isbn = :isbn
+                        GROUP BY libros.id
+                    """
+                    )
+    query_api.bindparams(bindparam("isbn", type_=String()))
+    datos_libro = db.execute(query_api, {"isbn":isbn}).fetchone()
+    db.close()
+    if datos_libro is None:
+        return render_template("error.html", error="Libro no existe"), 404
+    libro_JSON = {}
+    for dato in datos_libro._fields:
+        libro_JSON[dato] = datos_libro._get_by_key_impl_mapping(dato)
+    return libro_JSON
 
 # Error 404 Página no encontrada
 @app.errorhandler(404)
