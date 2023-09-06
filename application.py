@@ -5,7 +5,7 @@ from flask import Flask, session, render_template, request, flash, redirect, jso
 # para el manejo de las sesiones
 from flask_session import Session
 # para el manejo de la base de datos
-from sqlalchemy import create_engine, text, bindparam, String
+from sqlalchemy import create_engine, text, bindparam, String, Integer
 from sqlalchemy.orm import scoped_session, sessionmaker
 # para contraseñas hasheadas
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -208,10 +208,12 @@ def listalibros():
 def verlibro():
     isbn = request.args.get("isbn")
     # verificamos que el libro en la DB
-    query_libro = text("SELECT isbn FROM libros WHERE isbn = :isbn")
+    query_libro = text("SELECT id, isbn FROM libros WHERE isbn = :isbn")
     query_libro.bindparams(bindparam("isbn", type_=String()))
     libro = db.execute(query_libro,{"isbn":isbn}).fetchone()
     db.close()
+    id = int(libro.id)
+    print(id)
     if libro:
         response = []
         # pedimos los datos del libro a la API de Google books
@@ -219,6 +221,13 @@ def verlibro():
 
         if "items" in datos:
             response.append(datos['items'][0]['volumeInfo'])
+
+        # datos de reseñas
+        query_reseñas = text("SELECT * FROM ratings WHERE libro_id = :libro_id")
+        query_reseñas.bindparams(bindparam("libro_id", type_=Integer()))
+        reseñas = db.execute(query_reseñas, {"libro_id":id}).fetchall()
+        db.close()
+        print(reseñas)
         return render_template("verLibro.html", response=response)
     
     else:
