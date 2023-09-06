@@ -44,8 +44,62 @@ Detalles del libro
         </div>
     </div>
 </div>
-<section class="reseñas">
-    <h2 class="">Reviews</h2>
+<section class="reseña-propia">
+    <h2>Puntuación y Reseña</h2>
+    <div class="reseña-propia-pregunta">
+        ¿Qué Piensas de éste libro?
+    </div>
+    <div class="reseña-propia-puntuacion">
+        <img src="/static/images/star.svg" alt="">
+        <img src="/static/images/star.svg" alt="">
+        <img src="/static/images/star.svg" alt="">
+        <img src="/static/images/star.svg" alt="">
+        <img src="/static/images/star.svg" alt="">
+        <p>Puntua éste libro</p>
+    </div>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#modelId">
+        Escribe una Reseña
+    </button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reseña</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div> 
+                <form action="/reseña" method="post">
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="puntuacion-usuario-comentario">
+                                <img src="/static/images/star.svg" alt="">
+                                <img src="/static/images/star.svg" alt="">
+                                <img src="/static/images/star.svg" alt="">
+                                <img src="/static/images/star.svg" alt="">
+                                <img src="/static/images/star.svg" alt="">
+                            </div>
+                            <div class="form-group">
+                                <label for="message-text" class="col-form-label">Reseña:</label>
+                                <textarea class="form-control" id="message-text"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-warning">Enviar</button>
+                    </div>
+                </form>   
+            </div>
+        </div>
+    </div>
+
+</section>
+<section class="reseñas-comunidad">
+    <h2 class="">Reseñas de la comunidad</h2>
     <div class="post">
         <div class="user-block">
             <img class="img-circle img-bordered-sm" src="/static/images/avatar.png" alt="user image">
@@ -61,6 +115,7 @@ Detalles del libro
             <img src="/static/images/star-fill.svg" alt="">
             <img src="/static/images/star.svg" alt="">
             <img src="/static/images/star.svg" alt="">
+            
         </div>
         <p>
         Lorem ipsum represents a long-held tradition for designers,

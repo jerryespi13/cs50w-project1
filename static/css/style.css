@@ -57,11 +57,39 @@ html{
     line-height: 70px;
 }
 
-.reseñas{
+.reseña-propia{
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 50px;
+}
+.reseña-propia h2{
+    font-weight: 600;
+    color: #423e3e;
+    font-size: 48px;
+}
+
+.reseña-propia-pregunta{
+    color: #969292;
+    font-size: 30px;
+}
+
+.reseña-propia-puntuacion img{
+    height: 50px;
+}
+
+.puntuacion-usuario-comentario img{
+    width: 30px;
+}
+
+.reseña-propia-puntuacion p{
+    color: #6c757d;
+}
+
+.reseñas-comunidad{
     padding-bottom: 100px;
 }
 
-.reseñas h2{
+.reseñas-comunidad h2{
     text-align: center;
     font-weight: 600;
     color: #423e3e;
