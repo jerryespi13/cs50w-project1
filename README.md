@@ -43,6 +43,9 @@
 ### Importa los libros del csv a la base de datos
 >`python import.py`
 
+### Crea las tablas necesarias para el funcionamiento de la web
+>`python crearTablas.py`
+
 ## Corre la aplicación web
 >`flask run`
 
