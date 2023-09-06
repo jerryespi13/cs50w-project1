@@ -259,7 +259,7 @@ def api(isbn):
     libro_JSON = {}
     for dato in datos_libro._fields:
         libro_JSON[dato] = datos_libro._get_by_key_impl_mapping(dato)
-    return libro_JSON
+    return jsonify(libro_JSON)
 
 # Error 404 Página no encontrada
 @app.errorhandler(404)
