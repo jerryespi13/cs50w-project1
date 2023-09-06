@@ -80,6 +80,7 @@ def register():
                                 )
         # ejecutamos la consulta
         resultado = db.execute(query, {"usuario":usuario}).fetchall()
+        db.close()
         
         # comparamos el resultado de la columna usuario en la db 
         # devuelto por la consulta con el usuario ingresado por el usuario
@@ -110,6 +111,7 @@ def register():
         db.execute(query,{"nombre":nombre, "usuario":usuario, "contraseña":contraseña_segura})
         
         resultado = db.commit()
+        db.close()
         # despues que el usario se registre lo redireccionamos al login
         return redirect("/login")
 
@@ -195,6 +197,7 @@ def listalibros():
     """
     query_obtener_libros = text("SELECT title FROM libros")
     datos = db.execute(query_obtener_libros).fetchall()
+    db.close()
     libros = []
     for dato in datos:
         libros.append(dato.title)   
@@ -203,15 +206,23 @@ def listalibros():
 @app.route("/verlibro")
 @login_required
 def verlibro():
-    libro = request.args.get("isbn")
+    isbn = request.args.get("isbn")
+    # verificamos que el libro en la DB
+    query_libro = text("SELECT isbn FROM libros WHERE isbn = :isbn")
+    query_libro.bindparams(bindparam("isbn", type_=String()))
+    libro = db.execute(query_libro,{"isbn":isbn}).fetchone()
+    db.close()
     if libro:
         response = []
-        datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+libro).json()
+        # pedimos los datos del libro a la API de Google books
+        datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+libro.isbn).json()
 
         if "items" in datos:
             response.append(datos['items'][0]['volumeInfo'])
         return render_template("verLibro.html", response=response)
-
+    
+    else:
+        return render_template("error.html", error="Libro no existe"), 404
 
 # Error 404 Página no encontrada
 @app.errorhandler(404)
