@@ -212,8 +212,6 @@ def verlibro():
     query_libro.bindparams(bindparam("isbn", type_=String()))
     libro = db.execute(query_libro,{"isbn":isbn}).fetchone()
     db.close()
-    id = int(libro.id)
-    print(id)
     if libro:
         response = []
         # pedimos los datos del libro a la API de Google books
@@ -223,12 +221,20 @@ def verlibro():
             response.append(datos['items'][0]['volumeInfo'])
 
         # datos de reseñas
-        query_reseñas = text("SELECT * FROM ratings WHERE libro_id = :libro_id")
+        id = int(libro.id)
+        query_reseñas = text(
+                                """
+                                    SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY HH:MM'), usuarios.nombre
+                                    FROM ratings
+                                    INNER JOIN usuarios ON ratings.user_id = usuarios.id
+                                    WHERE ratings.libro_id = :libro_id
+                                """
+                            )
         query_reseñas.bindparams(bindparam("libro_id", type_=Integer()))
         reseñas = db.execute(query_reseñas, {"libro_id":id}).fetchall()
         db.close()
         print(reseñas)
-        return render_template("verLibro.html", response=response)
+        return render_template("verLibro.html", response=response, reseñas=reseñas)
     
     else:
         return render_template("error.html", error="Libro no existe"), 404

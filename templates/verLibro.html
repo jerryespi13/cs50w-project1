@@ -99,32 +99,30 @@ Detalles del libro
 
 </section>
 <section class="reseñas-comunidad">
-    <h2 class="">Reseñas de la comunidad</h2>
+    <h2>Reseñas de la comunidad</h2>
+    {%for reseña in reseñas%}
     <div class="post">
         <div class="user-block">
             <img class="img-circle img-bordered-sm" src="/static/images/avatar.png" alt="user image">
             <span class="username">
-            <a href="#">jerryespi</a>
+            <a href="#">{{reseña[3]}}</a>
             <a href="#" class="float-right btn-tool"><i class="fas fa-times"></i></a>
             </span>
-            <span class="description">Shared publicly - 7:30 PM today</span>
+            <span class="description">{{reseña[2]}}</span>
         </div>
         <div class="puntuacion-usuario">
+            {% for x  in range(reseña[1]) %}
             <img src="/static/images/star-fill.svg" alt="">
-            <img src="/static/images/star-fill.svg" alt="">
-            <img src="/static/images/star-fill.svg" alt="">
-            <img src="/static/images/star.svg" alt="">
-            <img src="/static/images/star.svg" alt="">
-            
+            {%endfor%}
+            {% for y in range(5 - reseña[1])%}
+                <img src="/static/images/star.svg" alt="">
+            {% endfor %}
         </div>
         <p>
-        Lorem ipsum represents a long-held tradition for designers,
-        typographers and the like. Some people hate it and argue for
-        its demise, but others ignore the hate as they create awesome
-        tools to help create filler text for everyone from bacon lovers
-        to Charlie Sheen fans.
+        {{reseña[0]}}
         </p>   
     </div>
+    {%endfor%}
 </section>
 
 <script src="/static/js/createRating.js"></script>
