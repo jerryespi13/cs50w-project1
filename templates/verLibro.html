@@ -49,11 +49,28 @@ Detalles del libro
     <div class="reseña-propia-pregunta">
         ¿Qué Piensas de éste libro?
     </div>
-    
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#modelId">
-        Escribe una Reseña
-    </button>
+    {%if review%}
+        {%for reseña in reseñas%}
+            {%if reseña[4] == session['user_id']%}
+                <div class="puntuacion-usuario">
+                    {% for x  in range(reseña[1]) %}
+                        <img src="/static/images/star-fill.svg" alt="">
+                    {%endfor%}
+                    {% for y in range(5 - reseña[1])%}
+                        <img src="/static/images/star.svg" alt="">
+                    {% endfor %}
+                </div>
+            {%endif%}
+        {%endfor%}
+        <button type="button" class="btn btn-secondary btn-lg mt-4" disabled data-toggle="modal" data-target="#modelId">
+            Ya has calificado este libro
+        </button>
+    {%else%}
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#modelId">
+            Escribe una reseña
+        </button>
+    {%endif%}
     
     <!-- Modal -->
     <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
@@ -69,7 +86,7 @@ Detalles del libro
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="puntuacion-usuario-comentario">
-                                <input type="radio" name="start" id="start1" value="5">
+                                <input type="radio" name="start" id="start1" value="5" required>
                                 <label for="start1"><img src="/static/images/star.svg" alt></label>
                                 <input type="radio" name="start" id="start2" value="4">
                                 <label for="start2"><img src="/static/images/star.svg" alt></label>

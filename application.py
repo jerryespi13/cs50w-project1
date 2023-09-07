@@ -39,7 +39,12 @@ def index():
 
 @app.route("/register", methods=["GET","POST"])
 def register():
+    """Ruta para registrar un usuario"""
     if request.method == "GET":
+        # si el usuario ya inicio sesion no puede ir a la ruta register
+        if session["user_id"]:
+            flash("Cierra sesión primeramente")
+            return redirect('/search')
         return render_template("register.html")
     
     else:
@@ -117,7 +122,12 @@ def register():
 
 @app.route("/login", methods=["GET","POST"])
 def login():
+    """Ruta para iniciar session"""
     if request.method == "GET":
+        # si el usuario ya inicio sesion no puede ir a la ruta login
+        if session["user_id"]:
+            flash("Si quieres iniciar sesión con otra cuenta, cierra esta sesión primeramente")
+            return redirect('/search')
         return render_template("login.html")
     
     else:
@@ -144,13 +154,14 @@ def login():
 
         # creamos la session del usuario
         session["user_id"] = resultado.id
+        session["user_name"] = resultado.usuario
         session["name"] = resultado.nombre
         return redirect("/search")
     
 # ruta para cerrar session
 @app.route("/logout")
 def logout():
-    """Log user out"""
+    """Ruta para cerrar session"""
     # Borramos todas las variables de session
     session.clear()
     # Redirigimos a la pagina de inicio
@@ -225,30 +236,36 @@ def verlibro():
             libro_id = int(libro.id)
             query_reseñas = text(
                                     """
-                                        SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY HH:MM'), usuarios.nombre
+                                        SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY') AS fecha, usuarios.nombre, usuarios.usuario
                                         FROM ratings
                                         INNER JOIN usuarios ON ratings.user_id = usuarios.id
                                         WHERE ratings.libro_id = :libro_id
+                                        ORDER BY fecha DESC
                                     """
                                 )
             query_reseñas.bindparams(bindparam("libro_id", type_=Integer()))
             reseñas = db.execute(query_reseñas, {"libro_id":libro_id}).fetchall()
             db.close()
-            print(reseñas)
-            return render_template("verLibro.html", response=response, reseñas=reseñas, libro_id=libro_id)   
-    
+
+            # verificamos si el usuario ya hizo una reseña en el libro
+            review = False
+            for reseña in reseñas:
+                # si ya la hizo mandamos TRUE en la variable reseña, si no mandamos False
+                if session['user_name'] in reseña:
+                    review = True
+            return render_template("verLibro.html", response=response, reseñas=reseñas, libro_id=libro_id, review=review)   
+
+        # si por get meten un isbn que no existe retornamos un error
         else:
             return render_template("error.html", error="Libro no existe"), 404
+    # metodo POST [Por aqui ingresamos la reseñas]
     else:
+        # capturamos datos
         puntuacion = int(request.form.get("start"))
         mensaje = request.form.get("mensaje")
         libro_id = int(request.form.get("libro_id"))
 
-        print(puntuacion)
-        print(mensaje)
-        print(session["user_id"])
-        print(libro_id)
-
+        # Query para insertar reseña
         query_insertar_reseña = text(
                                     """
                                         INSERT INTO ratings(user_id, libro_id, comentario, puntuacion)
@@ -264,7 +281,8 @@ def verlibro():
 
         db.execute(query_insertar_reseña,{"user_id":session['user_id'], "libro_id":libro_id, "mensaje":mensaje, "puntuacion":puntuacion})
         db.commit()
-        print(isbn)
+
+        # Retornamos a la pagina del mismo libro
         url = "/verlibro?isbn=" + isbn
         return redirect(url)
 
