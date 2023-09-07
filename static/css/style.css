@@ -71,19 +71,35 @@ html{
 .reseña-propia-pregunta{
     color: #969292;
     font-size: 30px;
+    margin-bottom: 20px;
 }
 
-.reseña-propia-puntuacion img{
-    height: 50px;
+.puntuacion-usuario-comentario{
+    direction: rtl;/* right to left */
+    unicode-bidi: bidi-override;/* bidi de bidireccional */
+}
+
+.puntuacion-usuario-comentario input[type = "radio"]{
+    display:none;
+}
+
+.puntuacion-usuario-comentario input[type = "radio"]:checked ~ label img{
+    content: url(/static/images/star-fill.svg);
+}
+
+.puntuacion-usuario-comentario label img:hover{
+    cursor: pointer;
+    content: url(/static/images/star-fill.svg);
 }
 
 .puntuacion-usuario-comentario img{
     width: 30px;
 }
 
-.reseña-propia-puntuacion p{
+.puntuacion-usuario-comentario p{
     color: #6c757d;
 }
+
 
 .reseñas-comunidad{
     padding-bottom: 100px;

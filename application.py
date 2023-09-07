@@ -203,40 +203,71 @@ def listalibros():
         libros.append(dato.title)   
     return jsonify({"libros":libros})
 
-@app.route("/verlibro")
+@app.route("/verlibro", methods=["GET","POST"])
 @login_required
 def verlibro():
     isbn = request.args.get("isbn")
-    # verificamos que el libro en la DB
-    query_libro = text("SELECT id, isbn FROM libros WHERE isbn = :isbn")
-    query_libro.bindparams(bindparam("isbn", type_=String()))
-    libro = db.execute(query_libro,{"isbn":isbn}).fetchone()
-    db.close()
-    if libro:
-        response = []
-        # pedimos los datos del libro a la API de Google books
-        datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+libro.isbn).json()
-
-        if "items" in datos:
-            response.append(datos['items'][0]['volumeInfo'])
-
-        # datos de reseñas
-        id = int(libro.id)
-        query_reseñas = text(
-                                """
-                                    SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY HH:MM'), usuarios.nombre
-                                    FROM ratings
-                                    INNER JOIN usuarios ON ratings.user_id = usuarios.id
-                                    WHERE ratings.libro_id = :libro_id
-                                """
-                            )
-        query_reseñas.bindparams(bindparam("libro_id", type_=Integer()))
-        reseñas = db.execute(query_reseñas, {"libro_id":id}).fetchall()
+    if request.method == "GET":
+        # verificamos que el libro en la DB
+        query_libro = text("SELECT id, isbn FROM libros WHERE isbn = :isbn")
+        query_libro.bindparams(bindparam("isbn", type_=String()))
+        libro = db.execute(query_libro,{"isbn":isbn}).fetchone()
         db.close()
-        return render_template("verLibro.html", response=response, reseñas=reseñas)
+        if libro:
+            response = []
+            # pedimos los datos del libro a la API de Google books
+            datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+libro.isbn).json()
+
+            if "items" in datos:
+                response.append(datos['items'][0]['volumeInfo'])
+
+            # datos de reseñas
+            libro_id = int(libro.id)
+            query_reseñas = text(
+                                    """
+                                        SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY HH:MM'), usuarios.nombre
+                                        FROM ratings
+                                        INNER JOIN usuarios ON ratings.user_id = usuarios.id
+                                        WHERE ratings.libro_id = :libro_id
+                                    """
+                                )
+            query_reseñas.bindparams(bindparam("libro_id", type_=Integer()))
+            reseñas = db.execute(query_reseñas, {"libro_id":libro_id}).fetchall()
+            db.close()
+            print(reseñas)
+            return render_template("verLibro.html", response=response, reseñas=reseñas, libro_id=libro_id)   
     
+        else:
+            return render_template("error.html", error="Libro no existe"), 404
     else:
-        return render_template("error.html", error="Libro no existe"), 404
+        puntuacion = int(request.form.get("start"))
+        mensaje = request.form.get("mensaje")
+        libro_id = int(request.form.get("libro_id"))
+
+        print(puntuacion)
+        print(mensaje)
+        print(session["user_id"])
+        print(libro_id)
+
+        query_insertar_reseña = text(
+                                    """
+                                        INSERT INTO ratings(user_id, libro_id, comentario, puntuacion)
+                                        VALUES(:user_id, :libro_id, :mensaje, :puntuacion)
+                                    """
+                                    )
+        query_insertar_reseña.bindparams(
+                                        bindparam("user_id", type_=Integer()),
+                                        bindparam("libro_id", type_=Integer()),
+                                        bindparam("mensaje", type_=String()),
+                                        bindparam("puntuacion", type_=Integer())
+        )
+
+        db.execute(query_insertar_reseña,{"user_id":session['user_id'], "libro_id":libro_id, "mensaje":mensaje, "puntuacion":puntuacion})
+        db.commit()
+        print(isbn)
+        url = "/verlibro?isbn=" + isbn
+        return redirect(url)
+
 
 @app.route("/api/<isbn>")
 def api(isbn):

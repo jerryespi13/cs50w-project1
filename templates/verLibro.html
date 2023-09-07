@@ -49,14 +49,7 @@ Detalles del libro
     <div class="reseña-propia-pregunta">
         ¿Qué Piensas de éste libro?
     </div>
-    <div class="reseña-propia-puntuacion">
-        <img src="/static/images/star.svg" alt="">
-        <img src="/static/images/star.svg" alt="">
-        <img src="/static/images/star.svg" alt="">
-        <img src="/static/images/star.svg" alt="">
-        <img src="/static/images/star.svg" alt="">
-        <p>Puntua éste libro</p>
-    </div>
+    
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#modelId">
         Escribe una Reseña
@@ -72,19 +65,26 @@ Detalles del libro
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div> 
-                <form action="/reseña" method="post">
+                <form action="" method="post">
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="puntuacion-usuario-comentario">
-                                <img src="/static/images/star.svg" alt="">
-                                <img src="/static/images/star.svg" alt="">
-                                <img src="/static/images/star.svg" alt="">
-                                <img src="/static/images/star.svg" alt="">
-                                <img src="/static/images/star.svg" alt="">
+                                <input type="radio" name="start" id="start1" value="5">
+                                <label for="start1"><img src="/static/images/star.svg" alt></label>
+                                <input type="radio" name="start" id="start2" value="4">
+                                <label for="start2"><img src="/static/images/star.svg" alt></label>
+                                <input type="radio" name="start" id="start3" value="3">
+                                <label for="start3"><img src="/static/images/star.svg" alt></label>
+                                <input type="radio" name="start" id="start4" value="2">
+                                <label for="start4"><img src="/static/images/star.svg" alt></label>
+                                <input type="radio" name="start" id="start5" value="1">
+                                <label for="start5"><img src="/static/images/star.svg" alt></label>
+                                <p>Puntua éste libro</p>
                             </div>
+                            <input type="hidden" name="libro_id" id="" value="{{libro_id}}">
                             <div class="form-group">
                                 <label for="message-text" class="col-form-label">Reseña:</label>
-                                <textarea class="form-control" id="message-text"></textarea>
+                                <textarea class="form-control" id="message-text" name="mensaje"></textarea>
                             </div>
                         </div>
                     </div>
