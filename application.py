@@ -1,4 +1,5 @@
 import os
+# para hacer peticiones a una URL
 import requests
 # Flask
 from flask import Flask, session, render_template, request, flash, redirect, jsonify, abort
@@ -9,9 +10,7 @@ from sqlalchemy import create_engine, text, bindparam, String, Integer
 from sqlalchemy.orm import scoped_session, sessionmaker
 # para contraseñas hasheadas
 from werkzeug.security import check_password_hash, generate_password_hash
-
-import werkzeug
-
+# archivo propio
 from helpers import *
 
 # para variables de entornos
