@@ -19,6 +19,18 @@ html{
 .navbar{
     font-size: large;
 }
+
+.busqueda h1{
+    text-align: center;
+    font-weight: 600;
+    color: #423e3e;
+}
+
+.busqueda p{
+    text-align: center;
+    color: #969292;
+    
+}
 .error{
     display:grid; 
     justify-content: center; 
