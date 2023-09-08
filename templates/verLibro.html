@@ -51,7 +51,7 @@ Detalles del libro
     </div>
     {%if review%}
         {%for reseña in reseñas%}
-            {%if reseña[4] == session['user_id']%}
+            {%if reseña[4] == session['user_name']%}
                 <div class="puntuacion-usuario">
                     {% for x  in range(reseña[1]) %}
                         <img src="/static/images/star-fill.svg" alt="">

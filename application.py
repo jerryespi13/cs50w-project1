@@ -42,7 +42,7 @@ def register():
     """Ruta para registrar un usuario"""
     if request.method == "GET":
         # si el usuario ya inicio sesion no puede ir a la ruta register
-        if session["user_id"]:
+        if "user_id" in session:
             flash("Cierra sesión primeramente")
             return redirect('/search')
         return render_template("register.html")
@@ -125,7 +125,7 @@ def login():
     """Ruta para iniciar session"""
     if request.method == "GET":
         # si el usuario ya inicio sesion no puede ir a la ruta login
-        if session["user_id"]:
+        if "user_id" in session:
             flash("Si quieres iniciar sesión con otra cuenta, cierra esta sesión primeramente")
             return redirect('/search')
         return render_template("login.html")
