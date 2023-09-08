@@ -1,7 +1,7 @@
 import os
 import requests
 # Flask
-from flask import Flask, session, render_template, request, flash, redirect, jsonify
+from flask import Flask, session, render_template, request, flash, redirect, jsonify, abort
 # para el manejo de las sesiones
 from flask_session import Session
 # para el manejo de la base de datos
@@ -9,6 +9,8 @@ from sqlalchemy import create_engine, text, bindparam, String, Integer
 from sqlalchemy.orm import scoped_session, sessionmaker
 # para contraseñas hasheadas
 from werkzeug.security import check_password_hash, generate_password_hash
+
+import werkzeug
 
 from helpers import *
 
@@ -188,11 +190,7 @@ def search():
                                     SELECT * FROM libros WHERE LOWER(title) LIKE :parametro OR isbn LIKE :parametro OR LOWER(author) LIKE :parametro
                                 """
                             )
-        query_libros.bindparams(
-            bindparam(
-                "parametro", type_=String()
-            )
-        )
+        query_libros.bindparams(bindparam("parametro", type_=String()))
         libro = db.execute(query_libros, {"parametro": '%{}%'.format(parametro)}).fetchall()
         db.close()
         # si la consulta al DB no devuelve nada, el libro no existe en nuestra DB
@@ -227,10 +225,18 @@ def verlibro():
         if libro:
             response = []
             # pedimos los datos del libro a la API de Google books
-            datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+libro.isbn).json()
+            
+            datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+libro.isbn)
 
-            if "items" in datos:
-                response.append(datos['items'][0]['volumeInfo'])
+            # si la respuesta es un codigo 429, error: 429 To many requests
+            if datos.status_code == 429:
+                abort(datos.status_code)
+            
+            # si la respuesta es un codigo 200 quiere decir que la peticion fue respondida correctamente
+            if datos.status_code == 200:
+                datos = datos.json()
+                if "items" in datos:
+                    response.append(datos['items'][0]['volumeInfo'])
 
             # datos de reseñas
             libro_id = int(libro.id)
@@ -314,3 +320,8 @@ def api(isbn):
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template("error.html", error="Página no encontrada..."), 404
+
+# Error 429 Página no encontrada
+@app.errorhandler(429)
+def to_many_requests(error):
+    return render_template("error.html", error="books.googleapis error: 429"), 429
