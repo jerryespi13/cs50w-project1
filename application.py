@@ -209,23 +209,29 @@ def search():
             return render_template("search.html")
         return render_template("search.html", libros=libro)
 
-@app.route("/listalibros", methods=["GET"])
-def listalibros():
+# para autocompletado
+@app.route("/autocomplete", methods=["GET"])
+def autocomplete():
     """
-    devuelve en JSON un listado de los libros para hacer uso de autocomplete
+    funcion que sirve para el autocompletado de busqueda
     """
+    # obtenemos lo que el usuario a digitado en la barra de busqueda
+    q = request.args.get("q")
     try:
-        query_obtener_libros = text("SELECT title FROM libros")
-        datos = db.execute(query_obtener_libros).fetchall()
+        # buscamos los libros que tengan la coincidencia con lo que el usuario esta digitando
+        query_obtener_libros = text("SELECT DISTINCT title FROM libros WHERE lower(title) LIKE :title LIMIT 5")
+        query_obtener_libros.bindparams(bindparam("title", type_=String()))
+        datos = db.execute(query_obtener_libros,{"title": '%{}%'.format(q)}).fetchall()
         db.close()
     except Exception as e:
         error = "server closed the connection unexpectedly [Culpa a render]"
-        print(e)
         return render_template("error.html", error=error , mensaje=e)
+    # tranformamos a una lista la respuesta de la bd
     libros = []
     for dato in datos:
-        libros.append(dato.title)   
-    return jsonify({"libros":libros})
+        libros.append(dato.title) 
+    # respondemos con ese resultado
+    return libros
 
 @app.route("/verlibro", methods=["GET","POST"])
 @login_required

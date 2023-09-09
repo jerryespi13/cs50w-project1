@@ -31,7 +31,10 @@ Búsqueda
         <input class="form-control col-lg-10 col-md-10 col-sm-12"
             autocomplete="off" type="search"
             placeholder="Busca tu libro favorito" id="search" name="search"
-            aria-label="Search" autofocus>
+            aria-label="Search" autofocus list="datalistOptions">
+            <!--Sugerencias de autocompletado Rellenado con JS y la consulta a la db en python-->
+            <datalist id="datalistOptions">
+            </datalist>
         <button
             class="btn btn-outline-success my-2 my-sm-1 col-lg-2 col-md-2 col-sm-12"
             type="submit">Buscar</button>
