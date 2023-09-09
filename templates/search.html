@@ -11,7 +11,7 @@ Búsqueda
         y a su vez ver reseñas hechas por otras personas
     </p>
 </div>
-<div class="search">
+<div class="input-search">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     <div class="alert alert-danger alert-dismissible fade show flashes"
@@ -39,8 +39,8 @@ Búsqueda
 </div>
 <div class="row d-flex justify-content-around pb-5 mb-5">
     {%for libro in libros%}
-    <div class="card mt-2 p-1 mx-2 col-10 col-sm-6 col-md-5 col-lg-5" >
-        <img class="card-img-top" src="/static/images/libro.png" alt="Imagen de libro" style="object-fit: cover; height:80%">
+    <div class="card mt-2 p-1 mx-2 col-10 col-sm-6 col-md-5 col-lg-5 primer_resultado" style="height: 450px;" >
+        <img class="card-img-top" src="/static/images/libro.png" alt="Imagen de libro" style="object-fit: contain; height:50%">
         <div class="card-body">
             <h5 class="card-title">{{libro.title}}</h5>
             <h6 class="card-subtitle mb-2 text-muted">Autor: {{libro.author}}</h6>
@@ -63,5 +63,5 @@ Búsqueda
     </div>
     {%endfor%}
 </div>
-
+<script src="/static/js/search.js"></script>
 {%endblock%}

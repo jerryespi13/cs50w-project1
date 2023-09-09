@@ -3,6 +3,7 @@
     margin: 0;
 }
 html{
+    scroll-behavior: smooth;
     position: relative;
     min-height: 100%;
 }
