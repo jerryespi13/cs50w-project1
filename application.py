@@ -184,14 +184,25 @@ def search():
             flash("No ingresó ningún término de búsqueda")
             return render_template("search.html")
         # buscamos que exista en nuestra DB
-        query_libros = text (
-                                """
-                                    SELECT * FROM libros WHERE LOWER(title) LIKE :parametro OR isbn LIKE :parametro OR LOWER(author) LIKE :parametro
-                                """
-                            )
-        query_libros.bindparams(bindparam("parametro", type_=String()))
-        libro = db.execute(query_libros, {"parametro": '%{}%'.format(parametro)}).fetchall()
-        db.close()
+        try:
+            query_libros = text (
+                                    """
+                                        SELECT * FROM libros WHERE LOWER(title) LIKE :parametro OR isbn LIKE :parametro OR LOWER(author) LIKE :parametro
+                                    """
+                                )
+            query_libros.bindparams(bindparam("parametro", type_=String()))
+            libro = db.execute(query_libros, {"parametro": '%{}%'.format(parametro)}).fetchall()
+            db.close()
+        except Exception as e:
+            error="server closed the connection unexpectedly [Culpa a render]"
+            mensaje="""
+                        (psycopg2.OperationalError) could not receive data from server: Software caused connection abort (0x00002745/10053)
+                        SSL SYSCALL error: Software caused connection abort (0x00002745/10053)
+                        (Background on this error at: https://sqlalche.me/e/20/e3q8)
+                    """
+            print(e)
+            return render_template("error.html", error=error, mensaje=mensaje)
+            
         # si la consulta al DB no devuelve nada, el libro no existe en nuestra DB
         if len(libro) == 0:
             flash("Libro no encontrado")
@@ -203,9 +214,14 @@ def listalibros():
     """
     devuelve en JSON un listado de los libros para hacer uso de autocomplete
     """
-    query_obtener_libros = text("SELECT title FROM libros")
-    datos = db.execute(query_obtener_libros).fetchall()
-    db.close()
+    try:
+        query_obtener_libros = text("SELECT title FROM libros")
+        datos = db.execute(query_obtener_libros).fetchall()
+        db.close()
+    except Exception as e:
+        error = "server closed the connection unexpectedly [Culpa a render]"
+        print(e)
+        return render_template("error.html", error=error , mensaje=e)
     libros = []
     for dato in datos:
         libros.append(dato.title)   
@@ -318,9 +334,14 @@ def api(isbn):
 # Error 404 Página no encontrada
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template("error.html", error="Página no encontrada..."), 404
+    mensaje = "Por favor verifica que tu direccion URL sea la correcta"
+    return render_template("error.html", error="Página no encontrada...", mensaje = mensaje), 404
 
-# Error 429 Página no encontrada
+# Error 429 To many requeste
 @app.errorhandler(429)
 def to_many_requests(error):
-    return render_template("error.html", error="books.googleapis error: 429"), 429
+    mensaje="""
+                Quota exceeded for quota metric 'Queries' and limit 'Queries per day' of service 'books.googleapis.com'
+                for consumer. "reason": "rateLimitExceeded"
+            """
+    return render_template("error.html", error="books.googleapis error: 429", mensaje=mensaje), 429

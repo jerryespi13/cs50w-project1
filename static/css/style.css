@@ -35,8 +35,7 @@ html{
     display:grid; 
     justify-content: center; 
     align-items: center; 
-    height:68vh; 
-    line-height: 68vh;
+    height: 100%;
 }
 
 .error picture img{
