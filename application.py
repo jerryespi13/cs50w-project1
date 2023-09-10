@@ -33,6 +33,8 @@ Session(app)
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
+# Define el número máximo de intentos que se hará una consulta a la DB
+max_attempts = 5
 
 @app.route("/")
 def index():
@@ -75,17 +77,29 @@ def register():
 
         # confirmamos que el usuario no exista
         # hacemos la consulta SQL
-        query = text(
-                        """
-                            SELECT * FROM usuarios WHERE usuario = :usuario
-                        """
-                    )
-        # pasamos los parametros
-        query = query.bindparams(
-                                    bindparam("usuario", type_=String())
-                                )
-        # ejecutamos la consulta
-        resultado = db.execute(query, {"usuario":usuario}).fetchall()
+        """
+            Aqui uso un bucle for por que en momentos render no responde a la consulta, entonces lo intento
+            unas cuantas veces mas hasta max_attempts veces
+        """
+        for _ in range(max_attempts):
+            try:
+                query = text(
+                                """
+                                    SELECT * FROM usuarios WHERE usuario = :usuario
+                                """
+                            )
+                # pasamos los parametros
+                query = query.bindparams(bindparam("usuario", type_=String()))
+                # ejecutamos la consulta
+                resultado = db.execute(query, {"usuario":usuario}).fetchall()
+                # Si la consulta se ejecuta correctamente se confirma la transacion y salimos del bloque for
+                db.commit()
+                break
+            except Exception as e:
+                # si ocurre una excepcion, revierte la transaccion y se intenta de nuevo gracias al for
+                print(e)
+                db.rollback()
+        # cerramos la conexion
         db.close()
         
         # comparamos el resultado de la columna usuario en la db 
@@ -100,24 +114,38 @@ def register():
         # si el usuario no existe guardamos los datos en la DB
         # generando un hash para la contraseña ingresada
         contraseña_segura = generate_password_hash(contraseña)
+
         # creamos nuestra query
-        query = text(
-                        """
-                            INSERT INTO usuarios (nombre, usuario, contraseña)
-                            VALUES (:nombre, :usuario, :contraseña);
-                        """
-                    )
-        # vinculamos variables
-        query.bindparams(
-                            bindparam("nombre", type_=String()),
-                            bindparam("usuario", type_=String()),
-                            bindparam("contraseña", type_=String())
-                        )
-        # asignamos variables y ejecutamos nuestra query
-        db.execute(query,{"nombre":nombre, "usuario":usuario, "contraseña":contraseña_segura})
-        
-        resultado = db.commit()
+        """
+            Aqui uso un bucle for por que en momentos render no responde a la consulta, entonces lo intento
+            unas cuantas veces mas hasta max_attempts veces
+        """
+        for _ in range(max_attempts):
+            try:
+                query = text(
+                                """
+                                    INSERT INTO usuarios (nombre, usuario, contraseña)
+                                    VALUES (:nombre, :usuario, :contraseña);
+                                """
+                            )
+                # vinculamos variables
+                query.bindparams(
+                                    bindparam("nombre", type_=String()),
+                                    bindparam("usuario", type_=String()),
+                                    bindparam("contraseña", type_=String())
+                                )
+                # asignamos variables y ejecutamos nuestra query
+                db.execute(query,{"nombre":nombre, "usuario":usuario, "contraseña":contraseña_segura})
+                # si la consulta se ejecuta correctamente confirmamos la transacion y salimos del bloque for
+                resultado = db.commit()
+                break
+            except Exception as e:
+                # si ocurre una excepcion, revierte la transaccion y se intenta de nuevo gracias al for
+                print(e)
+                db.rollback()
+        # cerramos la conecion
         db.close()
+
         # despues que el usario se registre lo redireccionamos al login
         return redirect("/login")
 
@@ -140,15 +168,28 @@ def login():
         elif not contraseña:
             flash("Introducir campo contraseña")
             return render_template("login.html")
-        query = text(
-                    """
-                        SELECT * FROM usuarios WHERE usuario = :usuario 
-                    """
-                    )
-        query.bindparams(
-            bindparam("usuario", type_=String())
-        )
-        resultado = db.execute(query, {"usuario":usuario}).fetchone()
+        
+        """
+            Aqui uso un bucle for por que en momentos render no responde a la consulta, entonces lo intento
+            unas cuantas veces mas hasta max_attempts veces
+        """
+        for _ in range(max_attempts):
+            try:
+                query = text(
+                            """
+                                SELECT * FROM usuarios WHERE usuario = :usuario 
+                            """
+                            )
+                query.bindparams(bindparam("usuario", type_=String()))
+                resultado = db.execute(query, {"usuario":usuario}).fetchone()
+                # si la consulta se ejecuta correctamente confirmamos la transaccion y salimos del bloque for
+                db.commit()
+                break
+            except Exception as e:
+                # si ocurre una excepcion, revierte la transaccion y se intenta de nuevo gracias al for
+                print(e)
+                db.rollback()
+        db.close()
         if resultado == None or not check_password_hash(resultado.contraseña, contraseña):
             flash("Usuario o Contraseña incorrecto")
             return redirect("/login")
@@ -183,25 +224,31 @@ def search():
         if not parametro:
             flash("No ingresó ningún término de búsqueda")
             return render_template("search.html")
+        
         # buscamos que exista en nuestra DB
-        try:
-            query_libros = text (
-                                    """
-                                        SELECT * FROM libros WHERE LOWER(title) LIKE :parametro OR isbn LIKE :parametro OR LOWER(author) LIKE :parametro
-                                    """
-                                )
-            query_libros.bindparams(bindparam("parametro", type_=String()))
-            libro = db.execute(query_libros, {"parametro": '%{}%'.format(parametro)}).fetchall()
-            db.close()
-        except Exception as e:
-            error="server closed the connection unexpectedly [Culpa a render]"
-            mensaje="""
-                        (psycopg2.OperationalError) could not receive data from server: Software caused connection abort (0x00002745/10053)
-                        SSL SYSCALL error: Software caused connection abort (0x00002745/10053)
-                        (Background on this error at: https://sqlalche.me/e/20/e3q8)
-                    """
-            print(e)
-            return render_template("error.html", error=error, mensaje=mensaje)
+        """
+            Aqui uso un bucle for por que en momentos render no responde a la consulta, entonces lo intento
+            unas cuantas veces mas hasta max_attempts veces
+        """
+        for _ in range(max_attempts):
+            try:
+                query_libros = text (
+                                        """
+                                            SELECT * FROM libros WHERE LOWER(title) LIKE :parametro OR isbn LIKE :parametro OR LOWER(author) LIKE :parametro
+                                        """
+                                    )
+                query_libros.bindparams(bindparam("parametro", type_=String()))
+                libro = db.execute(query_libros, {"parametro": '%{}%'.format(parametro)}).fetchall()
+                # Si la consulta se ejecuta correctamente confirma la transacion
+                db.commit()
+                break
+            except Exception as e:
+                # si ocurre una excepcion, revierte la transaccion
+                print(e)
+                db.rollback()
+        # cerramos la conexion
+        db.close()
+
             
         # si la consulta al DB no devuelve nada, el libro no existe en nuestra DB
         if len(libro) == 0:
@@ -222,6 +269,7 @@ def autocomplete():
         query_obtener_libros = text("SELECT DISTINCT title FROM libros WHERE lower(title) LIKE :title LIMIT 5")
         query_obtener_libros.bindparams(bindparam("title", type_=String()))
         datos = db.execute(query_obtener_libros,{"title": '%{}%'.format(q)}).fetchall()
+        db.commit()
         db.close()
     except Exception as e:
         error = "server closed the connection unexpectedly [Culpa a render]"
@@ -239,14 +287,28 @@ def verlibro():
     isbn = request.args.get("isbn")
     if request.method == "GET":
         # verificamos que el libro en la DB
-        query_libro = text("SELECT id, isbn FROM libros WHERE isbn = :isbn")
-        query_libro.bindparams(bindparam("isbn", type_=String()))
-        libro = db.execute(query_libro,{"isbn":isbn}).fetchone()
+        """
+        Aqui uso un bucle for por que en momentos render no responde a la consulta, entonces lo intento
+        unas cuantas veces mas hasta max_attempts veces
+        """
+        for _ in range(max_attempts):
+            try:
+                query_libro = text("SELECT id, isbn FROM libros WHERE isbn = :isbn")
+                query_libro.bindparams(bindparam("isbn", type_=String()))
+                libro = db.execute(query_libro,{"isbn":isbn}).fetchone()
+                # si la consulta se ejecuta correctamente se confirma la transaccion y salimos del bloque for
+                db.commit()
+                break
+            except Exception as e:
+                # si ocurre una excepcion, revierte la transaccion
+                print(e)
+                db.rollback()
+        # cerramos la conexion
         db.close()
         if libro:
             response = []
-            # pedimos los datos del libro a la API de Google books
             
+            # pedimos los datos del libro a la API de Google books
             datos = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+libro.isbn)
 
             # si la respuesta es un codigo 429, error: 429 To many requests
@@ -261,18 +323,32 @@ def verlibro():
 
             # datos de reseñas
             libro_id = int(libro.id)
-            query_reseñas = text(
-                                    """
-                                        SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY') AS fecha, usuarios.nombre, usuarios.usuario
-                                        FROM ratings
-                                        INNER JOIN usuarios ON ratings.user_id = usuarios.id
-                                        WHERE ratings.libro_id = :libro_id
-                                        ORDER BY fecha DESC
-                                    """
-                                )
-            query_reseñas.bindparams(bindparam("libro_id", type_=Integer()))
-            reseñas = db.execute(query_reseñas, {"libro_id":libro_id}).fetchall()
-            db.close()
+            """
+            Aqui uso un bucle for por que en momentos render no responde a la consulta, entonces lo intento
+            unas cuantas veces mas hasta max_attempts veces
+            """
+            for _ in range(max_attempts):
+                try:
+                    query_reseñas = text(
+                                            """
+                                                SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY') AS fecha, usuarios.nombre, usuarios.usuario
+                                                FROM ratings
+                                                INNER JOIN usuarios ON ratings.user_id = usuarios.id
+                                                WHERE ratings.libro_id = :libro_id
+                                                ORDER BY fecha DESC
+                                            """
+                                        )
+                    query_reseñas.bindparams(bindparam("libro_id", type_=Integer()))
+                    reseñas = db.execute(query_reseñas, {"libro_id":libro_id}).fetchall()
+                    # si la consulta se ejecuta correctamente se confirma la transaccion y salimos del bloque for
+                    db.commit()
+                    break
+                except Exception as e:
+                    # si ocurre una excepcion, revierte la transaccion
+                    print(e)
+                    db.rollback()
+                # cerramos la conexion
+                db.close()
 
             # verificamos si el usuario ya hizo una reseña en el libro
             review = False
@@ -293,21 +369,33 @@ def verlibro():
         libro_id = int(request.form.get("libro_id"))
 
         # Query para insertar reseña
-        query_insertar_reseña = text(
-                                    """
-                                        INSERT INTO ratings(user_id, libro_id, comentario, puntuacion)
-                                        VALUES(:user_id, :libro_id, :mensaje, :puntuacion)
-                                    """
-                                    )
-        query_insertar_reseña.bindparams(
-                                        bindparam("user_id", type_=Integer()),
-                                        bindparam("libro_id", type_=Integer()),
-                                        bindparam("mensaje", type_=String()),
-                                        bindparam("puntuacion", type_=Integer())
-        )
+        """
+        Aqui uso un bucle for por que en momentos render no responde a la consulta, entonces lo intento
+        unas cuantas veces mas hasta max_attempts veces
+        """
+        for _ in range(max_attempts):
+            try:
+                query_insertar_reseña = text(
+                                            """
+                                                INSERT INTO ratings(user_id, libro_id, comentario, puntuacion)
+                                                VALUES(:user_id, :libro_id, :mensaje, :puntuacion)
+                                            """
+                                            )
+                query_insertar_reseña.bindparams(
+                                                    bindparam("user_id", type_=Integer()),
+                                                    bindparam("libro_id", type_=Integer()),
+                                                    bindparam("mensaje", type_=String()),
+                                                    bindparam("puntuacion", type_=Integer())
+                                                )
 
-        db.execute(query_insertar_reseña,{"user_id":session['user_id'], "libro_id":libro_id, "mensaje":mensaje, "puntuacion":puntuacion})
-        db.commit()
+                db.execute(query_insertar_reseña,{"user_id":session['user_id'], "libro_id":libro_id, "mensaje":mensaje, "puntuacion":puntuacion})
+                # si la consulta se ejecuta correctamenteo confirmamos la transaccion y salimos del bucle for
+                db.commit()
+                break
+            except Exception as e:
+                # i ocurre una excepcion, revierte la transaccion y se vuele a interntar gracias al for
+                print(e)
+                db.rollback()
 
         # Retornamos a la pagina del mismo libro
         url = "/verlibro?isbn=" + isbn
@@ -329,6 +417,7 @@ def api(isbn):
                     )
     query_api.bindparams(bindparam("isbn", type_=String()))
     datos_libro = db.execute(query_api, {"isbn":isbn}).fetchone()
+    db.commit()
     db.close()
     if datos_libro is None:
         return render_template("error.html", error="Libro no existe"), 404
