@@ -30,7 +30,7 @@ body{
 }
 
 .login{
-    margin: 100px auto;
+    margin: 50px auto 100px auto;
     position: relative;
     width: 380px;
     padding: 20px 50px 20px;

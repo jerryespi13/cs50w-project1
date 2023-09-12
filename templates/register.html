@@ -3,82 +3,51 @@
 Registro
 {% endblock %}
 {% block main%}
-
-        <h1 class="text-center pt-3 pb-1">Registro de Usuarios</h1>
-        <div class="row pb-3">
-            <div class="col-xl-8 col-lg-8 col-md-11 col-sm-12 mx-auto">
-                <div class="card">
-                    <div class="card-header text-danger font-weight-bold">
-                        Registrate para poder entrar
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="/register">
-
-                            <!-- Mensajes Flash -->
-                            <div class="container ">
-                                {% with messages = get_flashed_messages() %}
-                                {% if messages %}
-                                <div class="alert alert-danger alert-dismissible fade show flashes"
-                                    role="alert">
-                                    {% for message in messages %}
-                                    <button type="button" class="close" data-dismiss="alert"
-                                        aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    <strong class="d-flex justify-content-center">{{ message }}</strong>
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
-                                {% endwith %}
-                                <script>
-                                    $(".alert").alert();
-                                </script>
-
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nombre:</label>
-                                <input type="text" autocomplete="off"
-                                    class="form-control" name="name" id="name"
-                                    placeholder="Ingresa su nombre" autofocus>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Usuario:</label>
-                                <input type="text" autocomplete="off"
-                                    class="form-control" name="username"
-                                    id="username"
-                                    placeholder="Ingrese su usuario">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password:</label>
-                                <input type="password" autocomplete="off"
-                                    class="form-control" name="password"
-                                    id="password"
-                                    placeholder="Ingrese su contraseña">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="confirmation"
-                                    class="form-label">Confirmar password:</label>
-                                <input type="password" class="form-control"
-                                    autocomplete="off" name="confirmation"
-                                    id="confirmation"
-                                    placeholder="Confirme su contraseña">
-                            </div>
-
-                            <div class="boton d-flex justify-content-center">
-                                <button type="submit" name="registrarse"
-                                class="btn btn-dark"><i class="bi bi-person-bounding-box"></i>
-                                Registrarse</button>
-                            </div>
-                            
-                        </form>
-                        <span class="d-flex justify-content-center pt-1">Ya tienes cuenta? <a class="pl-1" href="/login" id="login">Ingresa</a></span>
-                    </div>
-                </div>
-            </div>
+<div class="login">
+    <form method="post" action="/register">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div
+            class="alert alert-primary alert-dismissible fade show flashes"
+            role="alert">
+            {% for message in messages %}
+            <button type="button" class="close"
+                data-dismiss="alert"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong class="d-flex justify-content-center">{{ message }}</strong>
+            {% endfor %}
         </div>
-
-    </div>
+        {% endif %}
+        {% endwith %}
+        <h2>Registrate <br><span>para poder entrar!</span></h2>
+        <div class="inputBox">
+            <input type="text" name="name" placeholder="Nombre" id="name"
+                autocomplete="off">
+            <i class="fa-regular fa-user"></i>
+        </div>
+        <div class="inputBox">
+            <input type="text" name="username" placeholder="Usuario"
+                id="username" autocomplete="off">
+            <i class="fa-regular fa-user"></i>
+        </div>
+        <div class="inputBox">
+            <input type="password" name="password" placeholder="Contraseña"
+                id="password" autocomplete="off">
+            <i class="fa-solid fa-lock"></i>
+        </div>
+        <div class="inputBox">
+            <input type="password" name="confirmation" placeholder="Confirmar contraseña"
+                id="confirmation" autocomplete="off">
+            <i class="fa-solid fa-lock"></i>
+        </div>
+        <div class="inputBox">
+            <input type="submit" value="Log in">
+        </div>
+    </form>
+    <span class="d-flex justify-content-center pt-1">Ya tienes cuenta? <a
+            class="pl-1" href="/login" id="login">Ingresa</a></span>
+</div>
 
 {% endblock %}
