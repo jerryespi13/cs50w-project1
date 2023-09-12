@@ -29,14 +29,14 @@ Búsqueda
 
     <form class="form-inline pb-3 pt-2" action="/search" method="POST">
         <input class="form-control col-lg-10 col-md-10 col-sm-12"
-            autocomplete="off" type="search"
+            autocomplete="off" type="search" {%if parametro%} value="{{parametro}}" {%endif%}
             placeholder="Busca tu libro favorito" id="search" name="search"
-            aria-label="Search" autofocus list="datalistOptions">
+            aria-label="Search" {%if not parametro%} autofocus {%endif%} list="datalistOptions">
             <!--Sugerencias de autocompletado Rellenado con JS y la consulta a la db en python-->
             <datalist id="datalistOptions">
             </datalist>
         <button
-            class="btn btn-outline-success my-2 my-sm-1 col-lg-2 col-md-2 col-sm-12"
+            class="btn btn-outline-primary my-2 my-sm-1 col-lg-2 col-md-2 col-sm-12"
             type="submit">Buscar</button>
     </form>
 </div>

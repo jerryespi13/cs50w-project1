@@ -254,7 +254,7 @@ def search():
         if len(libro) == 0:
             flash("Libro no encontrado")
             return render_template("search.html")
-        return render_template("search.html", libros=libro)
+        return render_template("search.html", libros=libro, parametro=parametro)
 
 @app.route("/verlibro", methods=["GET","POST"])
 @login_required
