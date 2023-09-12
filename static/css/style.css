@@ -2,10 +2,18 @@
     padding: 0;
     margin: 0;
 }
+
 html{
     scroll-behavior: smooth;
     position: relative;
-    min-height: 100%;
+    min-height: 100vh;
+}
+
+body{
+
+    justify-content: center;
+    align-items: center;
+    background: #edf1f4
 }
 .footer{
     position: absolute;
@@ -15,10 +23,91 @@ html{
     margin-top: 10px;
     background: #f2f2f2;
     text-align: center;
-    }
+}
 
 .navbar{
     font-size: large;
+}
+
+.login{
+    margin: 100px auto;
+    position: relative;
+    width: 380px;
+    padding: 20px 50px 20px;
+    box-shadow: -14px -5px 100px -38px rgba(0,0,0,0.11);
+    -webkit-box-shadow: -14px -5px 100px -38px rgba(0,0,0,0.11);
+    -moz-box-shadow: -14px -5px 100px -38px rgba(0,0,0,0.11);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.login form{
+    position: relative;
+    width: 100%;
+}
+
+.login form h2{
+    font-size: 2em;
+    margin-bottom: 30px;
+    line-height: 0.9em;
+}
+
+.login form h2 span{
+    font-weight: 300;
+    font-size: 0.65em;
+}
+
+.login form .inputBox{
+    position: relative;
+    display: flex;
+}
+
+.login form .inputBox input{
+    border: none;
+    outline: none;
+    background: transparent;
+    border-radius: 10px;
+    font-size: 1em;
+}
+
+.login form .inputBox input[type="text"],
+.login form .inputBox input[type="password"]{
+    width: 100%;
+    padding: 15px 20px;
+    padding-left: 40px;
+    margin-bottom: 20px;
+    box-shadow: inset 5px 5px 10px rgba(0,0,0,0.1),
+    inset -5px -5px 10px #fff;
+}
+
+.login form .inputBox i{
+    position: absolute;
+    left: 20px;
+    top: 17px;
+}
+
+.login form .inputBox input[type="submit"]{
+    margin-top: 20px;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.1),
+    -5px -5px 10px #fff;
+    width: 100%;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.login form .inputBox input[type="submit"]:focus{
+    box-shadow: inset 5px 5px 10px rgba(0,0,0,0.1),
+    inset -5px -5px 10px #fff;
+}
+
+.login span{
+    font-weight: 300;
+    font-size: 0.9em;
 }
 
 .busqueda h1{

@@ -256,31 +256,6 @@ def search():
             return render_template("search.html")
         return render_template("search.html", libros=libro)
 
-# para autocompletado
-@app.route("/autocomplete", methods=["GET"])
-def autocomplete():
-    """
-    funcion que sirve para el autocompletado de busqueda
-    """
-    # obtenemos lo que el usuario a digitado en la barra de busqueda
-    q = request.args.get("q")
-    try:
-        # buscamos los libros que tengan la coincidencia con lo que el usuario esta digitando
-        query_obtener_libros = text("SELECT DISTINCT title FROM libros WHERE lower(title) LIKE :title LIMIT 5")
-        query_obtener_libros.bindparams(bindparam("title", type_=String()))
-        datos = db.execute(query_obtener_libros,{"title": '%{}%'.format(q)}).fetchall()
-        db.commit()
-        db.close()
-    except Exception as e:
-        error = "server closed the connection unexpectedly [Culpa a render]"
-        return render_template("error.html", error=error , mensaje=e)
-    # tranformamos a una lista la respuesta de la bd
-    libros = []
-    for dato in datos:
-        libros.append(dato.title) 
-    # respondemos con ese resultado
-    return libros
-
 @app.route("/verlibro", methods=["GET","POST"])
 @login_required
 def verlibro():
@@ -432,6 +407,31 @@ def api(isbn):
     for dato in datos_libro._fields:
         libro_JSON[dato] = datos_libro._get_by_key_impl_mapping(dato)
     return jsonify(libro_JSON)
+
+# para autocompletado
+@app.route("/autocomplete", methods=["GET"])
+def autocomplete():
+    """
+    funcion que sirve para el autocompletado de busqueda
+    """
+    # obtenemos lo que el usuario a digitado en la barra de busqueda
+    q = request.args.get("q")
+    try:
+        # buscamos los libros que tengan la coincidencia con lo que el usuario esta digitando
+        query_obtener_libros = text("SELECT DISTINCT title FROM libros WHERE lower(title) LIKE :title LIMIT 5")
+        query_obtener_libros.bindparams(bindparam("title", type_=String()))
+        datos = db.execute(query_obtener_libros,{"title": '%{}%'.format(q)}).fetchall()
+        db.commit()
+        db.close()
+    except Exception as e:
+        error = "server closed the connection unexpectedly [Culpa a render]"
+        return render_template("error.html", error=error , mensaje=e)
+    # tranformamos a una lista la respuesta de la bd
+    libros = []
+    for dato in datos:
+        libros.append(dato.title) 
+    # respondemos con ese resultado
+    return libros
 
 # Error 404 Página no encontrada
 @app.errorhandler(404)

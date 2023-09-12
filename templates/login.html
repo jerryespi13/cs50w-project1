@@ -5,21 +5,13 @@ Login
 {% block main %}
 <main>
     <div class="container">
-
-        <h1 class="text-center pt-5 pb-1">Acceso de Usuarios</h1>
-        <div class="row pb-5">
-            <div class="col-xl-8 col-lg-8 col-md-11 col-sm-12 mx-auto">
-
-                <div class="card">
-                    <div class="card-header text-danger font-weight-bold">
-                        Ingresa tus datos
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="/login">
-                            {% with messages = get_flashed_messages() %}
+    
+    <div class="login">
+      <form method="post" action="/login">
+        {% with messages = get_flashed_messages() %}
                             {% if messages %}
                             <div
-                                class="alert alert-danger alert-dismissible fade show flashes"
+                                class="alert alert-primary alert-dismissible fade show flashes"
                                 role="alert">
                                 {% for message in messages %}
                                 <button type="button" class="close"
@@ -32,41 +24,24 @@ Login
                             </div>
                             {% endif %}
                             {% endwith %}
-                            <script>
-                                $(".alert").alert();
-                            </script>
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Usuario:</label>
-                                <input type="text" autocomplete="off"
-                                    class="form-control" id="username"
-                                    name="username" autofocus
-                                    placeholder="Ingrese su usuario">
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Contraseña:</label>
-                                <input type="password" autocomplete="off"
-                                    class="form-control" id="password"
-                                    name="password"
-                                    placeholder="Ingrese su contraseña">
-                            </div>
-
-                            <div class="boton d-flex justify-content-center">
-                                <button type="submit" name="login"
-                                    class="btn btn-dark "><i
-                                        class="bi bi-person-bounding-box"></i>
-                                    Ingresar</button>
-                            </div>
-
-                        </form>
-                        <span class="d-flex justify-content-center pt-1">No
-                            estás registrado?<a class="pl-1" href="/register"
-                                id="singup">Registrate</a></span>
-                    </div>
-                </div>
-            </div>
+        <h2>Hola! <br><span>Bienvenido!</span></h2>
+        <div class="inputBox">
+          <input type="text" name="username" placeholder="Usuario">
+          <i class="fa-regular fa-user"></i>
         </div>
+        <div class="inputBox">
+          <input type="password" name="password" placeholder="Contraseña">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div class="inputBox">
+          <input type="submit" value="Log in">
+        </div>
+      </form>
+      <span >No estás registrado?<a class="pl-1" href="/register"
+            id="singup">Registrate</a></span>
 
     </div>
+  </div>
 </main>
 
 {%endblock%}
