@@ -97,7 +97,7 @@ def register():
                 break
             except Exception as e:
                 # si ocurre una excepcion, revierte la transaccion y se intenta de nuevo gracias al for
-                print(e)
+                print("Ocurrió un error por parte de render, pero lo sulucionamos")
                 db.rollback()
         # cerramos la conexion
         db.close()
@@ -141,7 +141,7 @@ def register():
                 break
             except Exception as e:
                 # si ocurre una excepcion, revierte la transaccion y se intenta de nuevo gracias al for
-                print(e)
+                print("Ocurrió un error por parte de render pero lo sulucionamos")
                 db.rollback()
         # cerramos la conecion
         db.close()
@@ -187,7 +187,7 @@ def login():
                 break
             except Exception as e:
                 # si ocurre una excepcion, revierte la transaccion y se intenta de nuevo gracias al for
-                print(e)
+                print("Ocurrió un error por parte de render pero lo solucionamos")
                 db.rollback()
         db.close()
         if resultado == None or not check_password_hash(resultado.contraseña, contraseña):
@@ -244,7 +244,7 @@ def search():
                 break
             except Exception as e:
                 # si ocurre una excepcion, revierte la transaccion
-                print(e)
+                print("Ocurrió un error por parte de render pero lo sulucionamos")
                 db.rollback()
         # cerramos la conexion
         db.close()
@@ -301,7 +301,7 @@ def verlibro():
                 break
             except Exception as e:
                 # si ocurre una excepcion, revierte la transaccion
-                print(e)
+                print("Ocurrió un error por parte de render pero lo sulucionamos")
                 db.rollback()
         # cerramos la conexion
         db.close()
@@ -345,7 +345,7 @@ def verlibro():
                     break
                 except Exception as e:
                     # si ocurre una excepcion, revierte la transaccion
-                    print(e)
+                    print("Ocurrió un error por parte de render pero lo sulucionamos")
                     db.rollback()
                 # cerramos la conexion
                 db.close()
@@ -393,7 +393,7 @@ def verlibro():
                 db.commit()
                 break
             except Exception as e:
-                # i ocurre una excepcion, revierte la transaccion y se vuele a interntar gracias al for
+                # si ocurre una excepcion, revierte la transaccion y se vuele a interntar gracias al for
                 print(e)
                 db.rollback()
 
@@ -401,24 +401,31 @@ def verlibro():
         url = "/verlibro?isbn=" + isbn
         return redirect(url)
 
-
 @app.route("/api/<isbn>")
 def api(isbn):
-    query_api = text(
-                    """
-                        SELECT libros.isbn, libros.title, libros.author, libros.year,
-                        COALESCE(to_char(AVG(ratings.puntuacion),'9.99'), '0') AS average_score,
-                        COUNT(ratings.puntuacion) AS review_count
-                        FROM libros
-                        LEFT OUTER JOIN ratings ON libros.id = ratings.libro_id
-                        WHERE libros.isbn = :isbn
-                        GROUP BY libros.id
-                    """
-                    )
-    query_api.bindparams(bindparam("isbn", type_=String()))
-    datos_libro = db.execute(query_api, {"isbn":isbn}).fetchone()
-    db.commit()
-    db.close()
+    try:
+        for _ in range(max_attempts):
+            query_api = text(
+                            """
+                                SELECT libros.isbn, libros.title, libros.author, libros.year,
+                                COALESCE(to_char(AVG(ratings.puntuacion),'9.99'), '0') AS average_score,
+                                COUNT(ratings.puntuacion) AS review_count
+                                FROM libros
+                                LEFT OUTER JOIN ratings ON libros.id = ratings.libro_id
+                                WHERE libros.isbn = :isbn
+                                GROUP BY libros.id
+                            """
+                            )
+            query_api.bindparams(bindparam("isbn", type_=String()))
+            datos_libro = db.execute(query_api, {"isbn":isbn}).fetchone()
+            # si la consulta se ejecuta correctamenteo confirmamos la transaccion y salimos del bucle for
+            db.commit()
+            break
+    except Exception as e:
+        # si ocurre una excepcion, revierte la transaccion y se vuele a interntar gracias al for
+        print("Ocurrió un error por parte de render pero lo sulucionamos")
+        db.rollback()
+
     if datos_libro is None:
         return render_template("error.html", error="Libro no existe"), 404
     libro_JSON = {}
