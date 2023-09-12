@@ -408,6 +408,12 @@ def api(isbn):
         libro_JSON[dato] = datos_libro._get_by_key_impl_mapping(dato)
     return jsonify(libro_JSON)
 
+@app.route("/editarusuario", methods=['POST', 'GET'])
+def editarUsuario():
+    if request.method == 'GET':
+        return render_template("editarusuario.html")
+
+
 # para autocompletado
 @app.route("/autocomplete", methods=["GET"])
 def autocomplete():
