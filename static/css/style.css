@@ -29,6 +29,16 @@ body{
     font-size: large;
 }
 
+.toggle{
+    display: flex;
+    justify-content: space-around;
+}
+
+.toggle .name-user{
+    margin: 5px auto 0 3px;
+    font-weight: 500;
+    color: #423e3e;
+}
 .login{
     margin: 50px auto 100px auto;
     position: relative;
