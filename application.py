@@ -10,8 +10,13 @@ from sqlalchemy import create_engine, text, bindparam, String, Integer
 from sqlalchemy.orm import scoped_session, sessionmaker
 # para contraseñas hasheadas
 from werkzeug.security import check_password_hash, generate_password_hash
+# para el guardado de archivos
+from werkzeug.utils import secure_filename
 # archivo propio
 from helpers import *
+
+# para obtener informacion del tiempo
+from datetime import datetime
 
 # para variables de entornos
 from dotenv import load_dotenv
@@ -35,6 +40,16 @@ db = scoped_session(sessionmaker(bind=engine))
 
 # Define el número máximo de intentos que se hará una consulta a la DB
 max_attempts = 5
+
+# carpeta donde se guardaran las imagenes que pongan de perfil los usuarios
+UPLOAD_FOLDER = 'static/uploads'
+# extensiones permitidas
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+# Configuramos Folder de subida
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# maximo tamaño del archivo permitido es de 5 MB
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1000 * 1000
 
 @app.route("/")
 def index():
@@ -189,7 +204,6 @@ def login():
                 # si ocurre una excepcion, revierte la transaccion y se intenta de nuevo gracias al for
                 print("Ocurrió un error por parte de render pero lo solucionamos")
                 db.rollback()
-        db.close()
         if resultado == None or not check_password_hash(resultado.contraseña, contraseña):
             flash("Usuario o Contraseña incorrecto")
             return redirect("/login")
@@ -198,6 +212,7 @@ def login():
         session["user_id"] = resultado.id
         session["user_name"] = resultado.usuario
         session["name"] = resultado.nombre
+        session["img"] = resultado.img
         return redirect("/search")
     
 # ruta para cerrar session
@@ -306,7 +321,7 @@ def verlibro():
                 try:
                     query_reseñas = text(
                                             """
-                                                SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY') AS fecha, usuarios.nombre, usuarios.usuario
+                                                SELECT ratings.comentario, ratings.puntuacion, to_char(ratings.created_at, 'DD/MM/YY') AS fecha, usuarios.nombre, usuarios.usuario, usuarios.img
                                                 FROM ratings
                                                 INNER JOIN usuarios ON ratings.user_id = usuarios.id
                                                 WHERE ratings.libro_id = :libro_id
@@ -411,8 +426,166 @@ def api(isbn):
 @app.route("/editarusuario", methods=['POST', 'GET'])
 def editarUsuario():
     if request.method == 'GET':
-        return render_template("editarusuario.html")
+        for _ in range(max_attempts):
+            try:
+                query = text("SELECT nombre, usuario FROM usuarios WHERE id = :id")
+                query.bindparams(bindparam("id", type_= String()))
+                datos = db.execute(query,{"id":session['user_id']}).fetchone()
+                db.commit()
+                break
+            except Exception as e:
+                print("Ocurrió un problema con render pero lo resolvimos en el momento")
+                db.rollback()
+        return render_template("editarusuario.html", datos=datos)
+    else:
+        # obtenemos los datos del formulario
+        nombre = request.form.get("name")
+        usuario = session['user_name']
+        contraseña = request.form.get("password")
+        confirmacion_contraseña = request.form.get("confirmation")
+        imagen = request.files['imagen']
 
+        if contraseña != confirmacion_contraseña:
+            flash("Contraseñas deben de ser iguales")
+            return redirect("/editarusuario")
+
+        print(nombre, usuario, contraseña, confirmacion_contraseña, imagen.filename)
+            # si se elige una imagen para cambiarla
+        if imagen.filename != '':
+            # si la imagen es un tipo de extension permitida
+            if imagen and allowed_file(imagen.filename):
+                # descomponemos el nombre en dos: seria el nombre en tal y la extesnsion
+                nombre_imagen = imagen.filename.split('.')
+                # armamos el nuevo nombre: nombre original + '_' + fecha + '.' + extension del archivo
+                filename = usuario + '_profilepicture.' + nombre_imagen[1]
+                # obtenemos una version segura del nombre, este sera el nombre final definitivo
+                nuevo_nombre_imagen = secure_filename(filename)
+                
+
+                # si hay una imagen asociada al producto la borramos para no tener imagenes inecesarias
+                for _ in range(max_attempts):
+                    try:
+                        query_imagen = text("SELECT img FROM usuarios WHERE id = :id")
+                        query_imagen.bindparams(bindparam("id", type_=String()))
+                        datos_imagen = db.execute(query_imagen, {"id":session['user_id']}).fetchone()
+                        db.commit()
+                        break
+                    except Exception as e:
+                        print("Ocurrió un problema con render pero fue solucionado en el momento")
+                        db.rollback()
+
+                # guardamos el archivo en la carpeta previamente definida, con el nombre que hemos creado
+                # la imagen se reescribe gracias a que ocupa el mismo nombre por eso no es necesario primero borrarla
+                imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], nuevo_nombre_imagen))
+
+                #guardamos la info nueva co su imagen nueva
+                # si tambien viene una contraseña nueva
+                if contraseña != "":
+                    # hasheamos la contraseña
+                    contra_hash = generate_password_hash(contraseña)
+                    for _ in range(max_attempts):
+                        try:
+                            query_actualizar_datos_con_imagen = text(
+                                                                        '''
+                                                                            UPDATE usuarios SET nombre = :nombre, contraseña = :contraseña, img = :imagen
+                                                                            WHERE id = :id
+                                                                        '''
+                                                                    )
+                            query_actualizar_datos_con_imagen.bindparams(
+                                                                            bindparam("nombre", type_=String()),
+                                                                            bindparam("contraseña", type_=String()),
+                                                                            bindparam("imagen", type_=String()),
+                                                                            bindparam("id", type_=String())
+                                                                        )
+                            db.execute(query_actualizar_datos_con_imagen,{"nombre":nombre,"contraseña":contra_hash, "imagen":nuevo_nombre_imagen, "id":session['user_id']})
+                            db.commit()
+                            break
+                        except Exception as e:
+                            print("Ocurrió un problema con render que fue resuelto inmediatamente")
+                            db.rollback()
+                    flash('Datos guardados correctamente!')
+                    actualizarVariablesSession()
+                    return redirect("/editarusuario")
+                    
+                # si no ingresaron nada en el campo contraseña, no se actualiza ese campo en la tabla de la DB
+                else:
+                    for _ in range(max_attempts):
+                        try:
+                            query_actualizar_datos_con_imagen = text(
+                                                                        '''
+                                                                            UPDATE usuarios SET nombre = :nombre, img = :imagen
+                                                                            WHERE id = :id
+                                                                        '''
+                                                                    )
+                            query_actualizar_datos_con_imagen.bindparams(
+                                                                            bindparam("nombre", type_=String()),
+                                                                            bindparam("imagen",type_=String()),
+                                                                            bindparam("id",type_=String())
+                                                                        )
+                            db.execute(query_actualizar_datos_con_imagen,{"nombre":nombre, "imagen":nuevo_nombre_imagen, "id":session['user_id']})
+                            db.commit()
+                            break
+                        except Exception as e:
+                            print("Ocurrió un problema con render que fue resuelto inmediatamente")
+                            db.rollback()
+                    flash('Datos guardados correctamente!')
+                    actualizarVariablesSession()
+                    return redirect("/editarusuario")
+            else:
+                flash('Imagen no permitida') 
+                # retornamos a la misma pagina con el mismo usuario seleccionado
+                return redirect("/editarusuario")
+
+        # si no viene imagen
+        else:
+            # si viene una contraseña nueva
+            if contraseña != "":
+                print("trae contraseña")
+                # hasheamos la contraseña
+                contra_hash = generate_password_hash(contraseña)
+                for _ in range(max_attempts):
+                    try:
+                        query_actualizar_datos_con_imagen = text(
+                                                                    '''
+                                                                        UPDATE usuarios SET nombre = :nombre, contraseña = :contraseña
+                                                                        WHERE id = :id
+                                                                    '''                                                                   
+                                                                )
+                        query_actualizar_datos_con_imagen.bindparams(
+                                                                        bindparam("nombre", type_=String()),
+                                                                        bindparam("contraseña", type_=String()),
+                                                                        bindparam("id",type_=String())
+                                                                    )
+                        db.execute(query_actualizar_datos_con_imagen,{"nombre":nombre,"contraseña":contra_hash, "id":session['user_id']})
+                        db.commit()
+                        break
+                    except Exception as e:
+                        print("Ocurrió un problema con render que fue resuelto inmediatamente")
+                        db.rollback()
+                flash('Datos guardados correctamente!')
+                actualizarVariablesSession()
+                return redirect("/editarusuario")
+                    
+            # si no ingresaron nada en el campo contraseña, no se actualiza ese campo en la tabla de la DB
+            else:
+                for _ in range(max_attempts):
+                    try:
+                        query_actualizar_datos_con_imagen = text(''' UPDATE usuarios SET nombre = :nombre WHERE id = :id ''')
+                        query_actualizar_datos_con_imagen.bindparams(
+                                                                        bindparam("nombre", type_=String()),
+                                                                        bindparam("id", type_=String())
+                                                                    )
+                        db.execute(query_actualizar_datos_con_imagen,{"nombre":nombre, "id":session['user_id']})
+                        db.commit()
+                        print("datos insertados")
+                        break
+                    except Exception as e:
+                        print("Ocurrió un problema con render que fue resuelto inmediatamente")
+                        print(e)
+                        db.rollback()
+                flash('Datos guardados correctamente!')
+                actualizarVariablesSession()
+                return redirect("/editarusuario")
 
 # para autocompletado
 @app.route("/autocomplete", methods=["GET"])

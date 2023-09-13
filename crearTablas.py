@@ -20,7 +20,7 @@ query_crear_tabla_usuarios = text(
                                                                                 "nombre" varchar(255) not null,
                                                                                 "usuario" varchar(255) not null,
                                                                                 "contraseña" varchar(255) not null,
-                                                                                "img" varchar(255) not null default '/static/images/avatar.png',
+                                                                                "img" varchar(255) not null default 'avatar.png',
                                                                                 "created_at" timestamp not null default NOW()
                                                                                 )
                                     """

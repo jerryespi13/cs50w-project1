@@ -2,7 +2,7 @@
 {% block title %}Editar Usuario{% endblock %}
 {% block main %}
 <div class="editar container">
-    <form method="post" action="/editarusuario">
+    <form method="post" action="/editarusuario" enctype="multipart/form-data">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <div
@@ -22,16 +22,16 @@
         <h2>Edita<br><span>tu informacíon a tu antojo</span></h2>
         <div class="inputBox">
             <input type="text" name="name" placeholder="Nombre" id="name"
-                autocomplete="off">
+                autocomplete="off" value="{{datos.nombre}}">
                 <i class="fa-solid fa-face-laugh-beam"></i>
         </div>
         <div class="inputBox">
-            <input type="text" name="username" placeholder="Usuario"
-                id="username" autocomplete="off">
+            <input type="text" name="username" placeholder="Usuario" disabled
+                id="username" autocomplete="off" value="{{datos.usuario}}">
             <i class="fa-regular fa-user"></i>
         </div>
         <div class="inputBox">
-            <input type="password" name="password" placeholder="Contraseña"
+            <input type="password" name="password" placeholder="Nueva contraseña"
                 id="password" autocomplete="off">
             <i class="fa-solid fa-lock"></i>
         </div>
