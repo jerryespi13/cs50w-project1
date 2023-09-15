@@ -398,7 +398,7 @@ def api(isbn):
             query_api = text(
                             """
                                 SELECT libros.isbn, libros.title, libros.author, libros.year,
-                                COALESCE(to_char(AVG(ratings.puntuacion),'9.99'), '0') AS average_score,
+                                coalesce(to_number(to_char(AVG(ratings.puntuacion),'999.99'),'9.99'),'0') AS average_score,
                                 COUNT(ratings.puntuacion) AS review_count
                                 FROM libros
                                 LEFT OUTER JOIN ratings ON libros.id = ratings.libro_id
