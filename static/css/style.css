@@ -329,6 +329,7 @@ body{
 
 .img-circle{
     border-radius: 50%;
+    object-fit: cover;
 }
 
 .img-bordered-sm {

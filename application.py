@@ -587,6 +587,30 @@ def editarUsuario():
                 actualizarVariablesSession()
                 return redirect("/editarusuario")
 
+@app.route("/misreseñas", methods=['GET','POST'])
+def misReseñas():
+    if request.method == 'GET':
+        # obtenemos la info de los libros donde el usuario ha puntuado
+        for _ in range(max_attempts):
+            try:
+                query_reseñas_del_usuario = text(
+                                                    """
+                                                            SELECT libros.title, libros.year, libros.author, libros.isbn, ratings.puntuacion, ratings.comentario
+                                                            FROM libros
+                                                            LEFT OUTER JOIN ratings ON libros.id = ratings.libro_id
+                                                            LEFT OUTER JOIN usuarios ON usuarios.id = ratings.user_id
+                                                            WHERE usuarios.id = :usuario_id
+                                                    """
+                                                )
+                query_reseñas_del_usuario.bindparams(bindparam("usuario_id", type_=Integer()))
+                reseñasUsuario = db.execute(query_reseñas_del_usuario, {"usuario_id":session['user_id']}).fetchall()
+                db.commit()
+                break
+            except Exception as e:
+                print("Ocurrió algo al tratar de obtener las reseñas del usuario, pero lo arreglamos")
+                db.rollback()
+        return render_template("reseñasDelUsuario.html", reseñasUsuario = reseñasUsuario)
+
 # para autocompletado
 @app.route("/autocomplete", methods=["GET"])
 def autocomplete():
