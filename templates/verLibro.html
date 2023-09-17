@@ -62,8 +62,8 @@ Detalles del libro
                 </div>
             {%endif%}
         {%endfor%}
-        <button type="button" class="btn btn-secondary btn-lg mt-4" disabled data-toggle="modal" data-target="#modelId">
-            Ya has calificado este libro
+        <button type="button" class="btn btn-secondary btn-lg mt-4" data-toggle="modal" data-target="#modelId">
+            Edita tu reseña
         </button>
     {%else%}
         <!-- Button trigger modal -->
@@ -82,7 +82,7 @@ Detalles del libro
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div> 
-                <form action="" method="post">
+                <form {%if review%} action="/editarReseña" {%else%} action=""{%endif%} method="post">
                     <div class="modal-body">
                         <div class="container-fluid">
                             <div class="puntuacion-usuario-comentario">
@@ -93,6 +93,9 @@ Detalles del libro
                                     <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
+                                {%if review%}{%for reseña in reseñas%}{%if reseña[4] == session['user_name']%}
+                                    <input type="hidden" name="puntuacion" id="puntuacion_usuario" value="{{reseña[1]}}">
+                                {%endif%}{%endfor%}{%endif%}
 
                                 <input type="radio" name="start" id="start1" value="5" required>
                                 <label for="start1"><img src="/static/images/star.svg" alt></label>
@@ -109,13 +112,17 @@ Detalles del libro
                             <input type="hidden" name="libro_id" id="" value="{{libro_id}}">
                             <div class="form-group">
                                 <label for="message-text" class="col-form-label">Reseña:</label>
-                                <textarea class="form-control" id="message-text" name="mensaje"></textarea>
+                                <textarea class="form-control" rows="6" id="message-text" name="mensaje">{%if review%}{%for reseña in reseñas%}{%if reseña[4] == session['user_name']%}{{reseña[0]}}{%endif%}{%endfor%}{%endif%}</textarea>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        {%if review%}
+                        <button type="submit" class="btn btn-warning">Editar reseña</button>
+                        {%else%}
                         <button type="submit" class="btn btn-warning">Enviar</button>
+                        {%endif%}
                     </div>
                 </form>   
             </div>

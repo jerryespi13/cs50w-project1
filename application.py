@@ -384,11 +384,64 @@ def verlibro():
                 break
             except Exception as e:
                 # si ocurre una excepcion, revierte la transaccion y se vuele a interntar gracias al for
-                print(e)
+                print("Ocurrió un error al tratar de insertar la reseña pero fue resuelto")
                 db.rollback()
 
         # Retornamos a la pagina del mismo libro
         url = "/verlibro?isbn=" + isbn
+        return redirect(url)
+
+@app.route("/editarReseña", methods=['POST'])
+def editarReseña():
+        # capturamos datos
+        puntuacion = int(request.form.get("start"))
+        mensaje = request.form.get("mensaje")
+        libro_id = int(request.form.get("libro_id"))
+        isbn=""
+        for _ in range(max_attempts):
+            try:
+                query_isbn = text("SELECT isbn FROM libros WHERE id = :id_libro")
+                query_isbn.bindparams(bindparam("id_libro", type_=Integer()))
+                isbn = db.execute(query_isbn,{"id_libro":libro_id}).fetchone()
+                db.commit()
+                break
+            except Exception as e:
+                print("Ocurrio un problema pero fue resuelto")
+                db.rollback()
+        
+
+
+        # Query para insertar reseña
+        """
+        Aqui uso un bucle for por que en momentos render no responde a la consulta, entonces lo intento
+        unas cuantas veces mas hasta max_attempts veces
+        """
+        for _ in range(max_attempts):
+            try:
+                query_actualizar_reseña = text(
+                                            """
+                                                UPDATE ratings SET comentario = :mensaje, puntuacion = :puntuacion
+                                                WHERE libro_id = :libro_id AND user_id = :user_id
+                                            """
+                                            )
+                query_actualizar_reseña.bindparams(
+                                                    bindparam("mensaje", type_=String()),
+                                                    bindparam("puntuacion", type_=Integer()),
+                                                    bindparam("libro_id", type_=Integer()),
+                                                    bindparam("user_id", type_=Integer())
+                                                )
+
+                db.execute(query_actualizar_reseña,{"user_id":session['user_id'], "libro_id":libro_id, "mensaje":mensaje, "puntuacion":puntuacion})
+                # si la consulta se ejecuta correctamenteo confirmamos la transaccion y salimos del bucle for
+                db.commit()
+                break
+            except Exception as e:
+                print("Ocurrió un error al tratar de actualizar la reseña pero fue resuelto")
+                # si ocurre una excepcion, revierte la transaccion y se vuele a interntar gracias al for
+                db.rollback()
+
+        # Retornamos a la pagina del mismo libro
+        url = "/verlibro?isbn=" + isbn[0]
         return redirect(url)
 
 @app.route("/api/<isbn>")
